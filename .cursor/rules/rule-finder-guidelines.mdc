@@ -1,0 +1,115 @@
+---
+alwaysApply: true
+---
+# Rule-Finder Project Guidelines
+
+## Stack
+- Next.js 16 App Router, TypeScript strict mode
+- Tailwind CSS v4 (mobile-first), Shadcn/ui components
+- Supabase (Postgres + Storage), OpenAI Responses API
+- Deployed on Vercel
+
+## Installed Shadcn Components
+button, input, command, card, skeleton, sonner, dialog
+
+## Code Patterns
+
+**React:**
+- Server Components by default; Client Components only when interactivity required
+- Use existing Shadcn components before creating custom ones
+- Loading, error, and empty states must be handled explicitly
+
+**API Routes:**
+- Validate input at the boundary
+- Return typed responses: `{ data }` on success, `{ error: string }` on failure
+- Keep orchestration in routes, business logic in `lib/`
+
+**Supabase:**
+- Use typed helpers in `lib/supabase/`, not raw client calls
+- All queries go through server-side client with service role for writes
+
+**TypeScript:**
+- Explicit return types on all exported functions
+- Prefer discriminated unions over optional fields for state
+- Use `ApiResponse<T>` type for all API responses (discriminated union)
+
+**Files:**
+- Components: `components/<ComponentName>.tsx`
+- API helpers: `lib/<domain>.ts`
+- Types: `types/database.ts` (Supabase), `types/index.ts` (shared app types)
+
+## Key Constraints
+- Vercel has 4.5MB request body limit—never POST raw PDFs through API routes
+- 1 PDF page = 1 OpenAI file (for citation mapping)
+- `pdf.js` runs client-side for parsing and rendering
+
+---
+
+## Completed (Phases 1-5)
+
+### Database Schema (Supabase)
+- `rulebooks` table: id, slug, title, year, pdf_url, thumbnail_url, page_count, status, openai_vector_store_id, ingested_pages, error_message
+- `rulebook_pages` table: id, rulebook_id, page_number, openai_file_id, text_length
+- Storage bucket `rulebooks` (public): `pdfs/`, `thumbnails/`, `text_coords/`
+
+### API Routes
+| Route | Purpose |
+|-------|---------|
+| `GET /api/rulebooks/search?q=` | Search by title (ilike), returns ready rulebooks only |
+| `POST /api/rulebooks/create-upload` | Creates DB row, returns signed upload URL for PDF |
+| `POST /api/rulebooks/ingest-batch` | Creates OpenAI vector store + files, parallelized |
+| `POST /api/rulebooks/upload-assets` | Uploads thumbnail + text_coords JSON to storage |
+| `POST /api/rulebooks/ask` | Queries OpenAI Responses API with file_search, resolves citations to page numbers |
+
+### Key Components
+- `GameSearch` — Debounced (250ms) search using Shadcn Command, navigates to `/games/[slug]`
+- `UploadForm` — Full upload flow with progress UI, handles all 5 steps
+- `ChatPanel` — Chat UI with message history, sends questions to `/api/rulebooks/ask`, displays citations as clickable page links
+- `RulebookViewer` — PDF viewer using pdf.js with lazy rendering via IntersectionObserver, page navigation, scroll-to-page support
+- `GamePageClient` — Client wrapper that wires citation clicks to PDF viewer scroll (uses dynamic import with `ssr: false` to avoid DOMMatrix error)
+
+### Lib Utilities
+- `lib/supabase/server.ts` — `createServerClient()` with service role
+- `lib/openai.ts` — `getOpenAIClient()` singleton
+- `lib/pdf-parser.ts` — Client-side `parsePDF(file)` extracts text+coords, generates thumbnail
+- `lib/slug.ts` — `generateSlug(title)` creates unique URL-friendly slugs
+
+### Upload Flow (Critical Path)
+1. `create-upload` → DB row + signed URL
+2. Client uploads PDF directly to Supabase Storage (bypasses Vercel limit)
+3. Client parses PDF with pdf.js → text_coords + thumbnail
+4. Client sends batches (25 pages) to `ingest-batch`
+5. `ingest-batch` uploads files in parallel, uses `vectorStores.fileBatches.createAndPoll()`
+6. `upload-assets` saves thumbnail + text_coords, updates pdf_url
+7. Redirect to `/games/[slug]`
+
+### Types to Reuse
+- `ApiResponse<T>` — Discriminated union for API responses
+- `RulebookTextCoords` — Text + bounding boxes for highlighting
+- `RulebookSearchResult` — Search result shape
+
+### Ask Flow (Q&A)
+1. User submits question via `ChatPanel`
+2. `POST /api/rulebooks/ask` fetches `openai_vector_store_id` from DB
+3. Calls OpenAI Responses API with `file_search` tool and `vector_store_ids`
+4. Extracts `output_text` and `file_citation` annotations
+5. Resolves `file_id` → `page_number` via `rulebook_pages` table
+6. Returns answer + citations array
+7. `ChatPanel` displays answer, citation clicks trigger `scrollViewerToPage()`
+
+### Key Patterns Learned
+- **pdf.js SSR fix**: Use `next/dynamic` with `ssr: false` for components importing pdfjs-dist (avoids "DOMMatrix is not defined")
+- **pdf.js worker**: Load from unpkg with `.mjs` extension: `https://unpkg.com/pdfjs-dist@${version}/build/pdf.worker.min.mjs`
+- **Canvas race condition**: Track both `renderedPages` AND `renderingPages` refs to prevent concurrent renders to same canvas
+- **OpenAI Responses API**: `vector_store_ids` goes inside the tool object, model is `gpt-4o-mini`
+
+---
+
+## Remaining (Phase 6)
+
+### Phase 6 – Polish & UX
+- `/games` list with pagination
+- Mobile responsiveness
+- Loading skeletons, error states
+- SEO meta tags
+- UX improvements: upload modal, refined layouts, transitions
