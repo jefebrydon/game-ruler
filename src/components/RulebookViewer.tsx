@@ -79,6 +79,7 @@ export function RulebookViewer({
 
         await page.render({
           canvasContext: context,
+          canvas,
           viewport,
         }).promise;
 
