@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import type { ApiResponse, RulebookTextCoords } from "@/types";
+import type { ApiResponse } from "@/types";
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 const BATCH_SIZE = 25; // Pages per batch (parallelized uploads allow larger batches)
@@ -104,7 +104,7 @@ export function UploadForm(): React.ReactElement {
 
       // Dynamic import to avoid SSR issues
       const { parsePDF } = await import("@/lib/pdf-parser");
-      const { pageCount, textCoords, thumbnailBlob } = await parsePDF(file);
+      const { pageCount, pages, thumbnailBlob } = await parsePDF(file);
 
       // Step 4: Ingest pages in batches
       const totalBatches = Math.ceil(pageCount / BATCH_SIZE);
@@ -119,11 +119,11 @@ export function UploadForm(): React.ReactElement {
           total: pageCount,
         });
 
-        const pages = textCoords.pages
+        const batchPages = pages
           .filter((p) => p.pageNumber >= startPage && p.pageNumber <= endPage)
           .map((p) => ({
             pageNumber: p.pageNumber,
-            text: p.fullText,
+            text: p.text,
           }));
 
         const ingestRes = await fetch("/api/rulebooks/ingest-batch", {
@@ -132,7 +132,7 @@ export function UploadForm(): React.ReactElement {
           body: JSON.stringify({
             rulebookId,
             batchIndex,
-            pages,
+            pages: batchPages,
             isLastBatch: batchIndex === totalBatches - 1,
             totalPages: pageCount,
           }),
@@ -149,10 +149,10 @@ export function UploadForm(): React.ReactElement {
         }
       }
 
-      // Step 5: Upload thumbnail and text_coords
-      setState({ step: "finalizing", message: "Uploading assets..." });
+      // Step 5: Upload thumbnail
+      setState({ step: "finalizing", message: "Uploading thumbnail..." });
 
-      await uploadAssets(rulebookId, thumbnailBlob, textCoords);
+      await uploadThumbnail(rulebookId, thumbnailBlob);
 
       // Step 6: Navigate to game page
       toast.success("Rulebook uploaded successfully!");
@@ -291,23 +291,15 @@ function ProgressDisplay({ state }: { state: UploadState }): React.ReactElement 
 }
 
 /**
- * Upload thumbnail and text_coords to Supabase Storage.
+ * Upload thumbnail to Supabase Storage.
  */
-async function uploadAssets(
+async function uploadThumbnail(
   rulebookId: string,
-  thumbnailBlob: Blob,
-  textCoords: RulebookTextCoords
+  thumbnailBlob: Blob
 ): Promise<void> {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  if (!supabaseUrl) {
-    throw new Error("Supabase URL not configured");
-  }
-
-  // We need to upload via our API since we need the service role key
   const formData = new FormData();
   formData.append("rulebookId", rulebookId);
   formData.append("thumbnail", thumbnailBlob, "thumbnail.png");
-  formData.append("textCoords", JSON.stringify(textCoords));
 
   const res = await fetch("/api/rulebooks/upload-assets", {
     method: "POST",
@@ -316,6 +308,6 @@ async function uploadAssets(
 
   if (!res.ok) {
     const json = await res.json();
-    throw new Error(json.error || "Failed to upload assets");
+    throw new Error(json.error || "Failed to upload thumbnail");
   }
 }

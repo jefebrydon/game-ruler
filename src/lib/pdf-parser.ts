@@ -2,61 +2,48 @@
 
 import * as pdfjsLib from "pdfjs-dist";
 import type { TextItem as PdfTextItem } from "pdfjs-dist/types/src/display/api";
-import type { RulebookTextCoords, PageTextCoords, TextItem } from "@/types";
 
 // Set worker source - unpkg mirrors npm directly, ensuring version match
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
 
+export type PageText = {
+  pageNumber: number;
+  text: string;
+};
+
 export type ParsedPDF = {
   pageCount: number;
-  textCoords: RulebookTextCoords;
+  pages: PageText[];
   thumbnailBlob: Blob;
 };
 
 /**
- * Parse a PDF file to extract text content with coordinates and generate a thumbnail.
+ * Parse a PDF file to extract text content and generate a thumbnail.
  */
 export async function parsePDF(file: File): Promise<ParsedPDF> {
   const arrayBuffer = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
 
-  const pages: PageTextCoords[] = [];
+  const pages: PageText[] = [];
   let thumbnailBlob: Blob | null = null;
 
   for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
     const page = await pdf.getPage(pageNum);
     const textContent = await page.getTextContent();
-    const viewport = page.getViewport({ scale: 1.0 });
 
-    // Extract text items with positions
-    const items: TextItem[] = [];
+    // Extract text only (no coordinates needed)
     let fullText = "";
-
     for (const item of textContent.items) {
-      // Type guard for text items (not marked content)
       if (!("str" in item)) continue;
       const textItem = item as PdfTextItem;
-
       if (textItem.str) {
-        // Transform coordinates from PDF space
-        const [, , , , tx, ty] = textItem.transform;
-        
-        items.push({
-          text: textItem.str,
-          x: tx,
-          y: viewport.height - ty, // Flip Y coordinate
-          width: textItem.width,
-          height: textItem.height,
-        });
-        
         fullText += textItem.str + " ";
       }
     }
 
     pages.push({
       pageNumber: pageNum,
-      fullText: fullText.trim(),
-      items,
+      text: fullText.trim(),
     });
 
     // Generate thumbnail from first page
@@ -71,7 +58,7 @@ export async function parsePDF(file: File): Promise<ParsedPDF> {
 
   return {
     pageCount: pdf.numPages,
-    textCoords: { pages },
+    pages,
     thumbnailBlob,
   };
 }

@@ -50,7 +50,7 @@ button, input, command, card, skeleton, sonner, dialog
 ### Database Schema (Supabase)
 - `rulebooks` table: id, slug, title, year, pdf_url, thumbnail_url, page_count, status, openai_vector_store_id, ingested_pages, error_message
 - `rulebook_pages` table: id, rulebook_id, page_number, openai_file_id, text_length
-- Storage bucket `rulebooks` (public): `pdfs/`, `thumbnails/`, `text_coords/`
+- Storage bucket `rulebooks` (public): `pdfs/`, `thumbnails/`
 
 ### API Routes
 | Route | Purpose |
@@ -58,7 +58,7 @@ button, input, command, card, skeleton, sonner, dialog
 | `GET /api/rulebooks/search?q=` | Search by title (ilike), returns ready rulebooks only |
 | `POST /api/rulebooks/create-upload` | Creates DB row, returns signed upload URL for PDF |
 | `POST /api/rulebooks/ingest-batch` | Creates OpenAI vector store + files, parallelized |
-| `POST /api/rulebooks/upload-assets` | Uploads thumbnail + text_coords JSON to storage |
+| `POST /api/rulebooks/upload-assets` | Uploads thumbnail to storage |
 | `POST /api/rulebooks/ask` | Queries OpenAI Responses API with file_search, resolves citations to page numbers |
 
 ### Key Components
@@ -71,21 +71,20 @@ button, input, command, card, skeleton, sonner, dialog
 ### Lib Utilities
 - `lib/supabase/server.ts` — `createServerClient()` with service role
 - `lib/openai.ts` — `getOpenAIClient()` singleton
-- `lib/pdf-parser.ts` — Client-side `parsePDF(file)` extracts text+coords, generates thumbnail
+- `lib/pdf-parser.ts` — Client-side `parsePDF(file)` extracts text, generates thumbnail
 - `lib/slug.ts` — `generateSlug(title)` creates unique URL-friendly slugs
 
 ### Upload Flow (Critical Path)
 1. `create-upload` → DB row + signed URL
 2. Client uploads PDF directly to Supabase Storage (bypasses Vercel limit)
-3. Client parses PDF with pdf.js → text_coords + thumbnail
+3. Client parses PDF with pdf.js → text + thumbnail
 4. Client sends batches (25 pages) to `ingest-batch`
 5. `ingest-batch` uploads files in parallel, uses `vectorStores.fileBatches.createAndPoll()`
-6. `upload-assets` saves thumbnail + text_coords, updates pdf_url
+6. `upload-assets` saves thumbnail, updates pdf_url
 7. Redirect to `/games/[slug]`
 
 ### Types to Reuse
 - `ApiResponse<T>` — Discriminated union for API responses
-- `RulebookTextCoords` — Text + bounding boxes for highlighting
 - `RulebookSearchResult` — Search result shape
 
 ### Ask Flow (Q&A)

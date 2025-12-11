@@ -13,28 +13,6 @@ export type {
 } from "./database";
 
 /**
- * Text coordinates structure for PDF highlighting.
- * Stored in Supabase Storage as text_coords/<rulebookId>.json
- */
-export type TextItem = {
-  text: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
-
-export type PageTextCoords = {
-  pageNumber: number;
-  fullText: string;
-  items: TextItem[];
-};
-
-export type RulebookTextCoords = {
-  pages: PageTextCoords[];
-};
-
-/**
  * API response types.
  * All API routes return either { data } or { error }.
  */

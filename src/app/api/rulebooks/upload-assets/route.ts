@@ -4,7 +4,6 @@ import type { ApiResponse } from "@/types";
 
 type UploadAssetsResponse = {
   thumbnailUrl: string;
-  textCoordsUrl: string;
   pdfUrl: string;
 };
 
@@ -15,9 +14,8 @@ export async function POST(
     const formData = await request.formData();
     const rulebookId = formData.get("rulebookId") as string;
     const thumbnail = formData.get("thumbnail") as File;
-    const textCoordsJson = formData.get("textCoords") as string;
 
-    if (!rulebookId || !thumbnail || !textCoordsJson) {
+    if (!rulebookId || !thumbnail) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -45,31 +43,10 @@ export async function POST(
       );
     }
 
-    // Upload text_coords JSON
-    const textCoordsPath = `text_coords/${rulebookId}.json`;
-    const { error: textCoordsError } = await supabase.storage
-      .from("rulebooks")
-      .upload(textCoordsPath, textCoordsJson, {
-        contentType: "application/json",
-        upsert: true,
-      });
-
-    if (textCoordsError) {
-      console.error("Text coords upload error:", textCoordsError);
-      return NextResponse.json(
-        { error: "Failed to upload text coordinates" },
-        { status: 500 }
-      );
-    }
-
     // Get public URLs
     const { data: thumbnailUrlData } = supabase.storage
       .from("rulebooks")
       .getPublicUrl(thumbnailPath);
-
-    const { data: textCoordsUrlData } = supabase.storage
-      .from("rulebooks")
-      .getPublicUrl(textCoordsPath);
 
     const { data: pdfUrlData } = supabase.storage
       .from("rulebooks")
@@ -95,7 +72,6 @@ export async function POST(
     return NextResponse.json({
       data: {
         thumbnailUrl: thumbnailUrlData.publicUrl,
-        textCoordsUrl: textCoordsUrlData.publicUrl,
         pdfUrl: pdfUrlData.publicUrl,
       },
     });

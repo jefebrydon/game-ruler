@@ -7,7 +7,7 @@
 * **pdf.js** in the browser for:
 
   * Rendering PDF pages to canvas in the Rulebook Viewer
-  * Extracting text + glyph positions for later bounding-box highlighting
+  * Extracting text content for OpenAI ingestion
 
 **Backend**
 
@@ -21,7 +21,7 @@
 * **Supabase** for:
 
   * **Postgres**: rulebooks, page-file mapping
-  * **Storage**: original PDFs and a per-rulebook JSON with text+coordinates
+  * **Storage**: original PDFs and thumbnails
 
 **Important infra constraint**
 
@@ -108,7 +108,6 @@ In Supabase Postgres:
 In Supabase Storage (bucket: `rulebooks`, **public**):
 
 * `pdfs/<rulebookId>.pdf`
-* `text_coords/<rulebookId>.json` – text + bounding boxes for every page
 * `thumbnails/<rulebookId>.png` – first page preview image
 
 ---
@@ -148,25 +147,15 @@ In Supabase Storage (bucket: `rulebooks`, **public**):
 3. Load the `File` object with pdf.js (`pdfjs-dist`):
 
    * Iterate pages.
-   * For each page:
-     * `page.getTextContent()` → text items with glyph positions.
-     * (Page 1 only) Render to `<canvas>` at low scale for thumbnail.
+   * For each page: `page.getTextContent()` → extract text content.
+   * (Page 1 only) Render to `<canvas>` at low scale for thumbnail.
 
-4. Build a **text + coords structure**:
+4. Build a simple pages array:
 
 ```ts
-type RulebookTextCoords = {
-  pages: {
-    pageNumber: number;
-    fullText: string;
-    items: {
-      text: string;
-      x: number;
-      y: number;
-      width: number;
-      height: number;
-    }[];
-  }[];
+type PageText = {
+  pageNumber: number;
+  text: string;
 };
 ```
 
@@ -217,12 +206,11 @@ In `/api/rulebooks/ingest-batch`:
     * Update `rulebooks`: `status = 'ready'`, `page_count = totalPages`.
     * Return `{ success: true, status: 'ready' }`.
 
-### Step 5 – Client: upload thumbnail + text_coords JSON
+### Step 5 – Client: upload thumbnail
 
 12. After final batch succeeds:
     * Upload `thumbnailBlob` → `thumbnails/<rulebookId>.png`.
-    * Upload `text_coords` JSON → `text_coords/<rulebookId>.json`.
-    * PATCH `/api/rulebooks/[id]` with `{ thumbnail_url, pdf_url }` (full public URLs).
+    * Update rulebook record with `{ thumbnail_url, pdf_url }` (full public URLs).
 
 13. Navigate user to `/games/[slug]` – their rulebook is ready!
 
@@ -296,14 +284,13 @@ In `/api/rulebooks/ingest-batch`:
 
 ---
 
-## 6. Rulebook Viewer + bounding-box highlight
+## 6. Rulebook Viewer
 
 ### Rendering (with lazy loading)
 
 1. On `/games/[slug]`:
 
 * Fetch rulebook metadata (including `pdf_url`, `page_count`).
-* Load `text_coords/<rulebookId>.json` into state.
 
 2. **PDF rendering with virtualization:**
 
@@ -317,22 +304,11 @@ In `/api/rulebooks/ingest-batch`:
 * Page number indicator ("Page 12 of 48").
 * Programmatic scroll to any page via ref.
 
-### Highlighting a rule
+### Citation navigation
 
 4. When `/api/rulebooks/ask` responds with `{ pageNumber }`:
 
 * Scroll that page into view (`scrollIntoView({ behavior: "smooth" })`).
-
-5. **Quote highlighting (optional for v1):**
-
-* If the model quoted text in its answer, fuzzy-match against `text_coords.pages[pageNumber].fullText`.
-* Find the index range, map to `items[]` bounding boxes.
-* Draw a semi-transparent overlay on the canvas.
-
-6. **Fallback:**
-
-* If fuzzy match fails, just scroll to the page (no highlight).
-* Show: "See page 12 for details."
 
 ---
 
@@ -394,7 +370,7 @@ In `/api/rulebooks/ingest-batch`:
 13. Implement `POST /api/rulebooks/create-upload`.
 14. Implement `POST /api/rulebooks/ingest-batch`.
 15. Frontend: PDF parsing with pdf.js, batched upload loop, progress UI.
-16. Upload thumbnail + text_coords to Supabase on completion.
+16. Upload thumbnail to Supabase on completion.
 
 **Phase 5 – Viewer & chat (functional, basic UI)**
 
@@ -403,7 +379,6 @@ In `/api/rulebooks/ingest-batch`:
 17. `/games/[slug]` page:
     * Fetch rulebook metadata.
     * Render PDF with virtualized page list.
-    * Load `text_coords`.
 
 18. Implement `POST /api/rulebooks/ask`:
     * Responses API + `file_search`.

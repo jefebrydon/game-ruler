@@ -59,5 +59,4 @@ CREATE TRIGGER rulebooks_updated_at
 -- 1. Create bucket named "rulebooks" with public access
 -- 2. Storage paths:
 --    - pdfs/<rulebookId>.pdf
---    - text_coords/<rulebookId>.json
 --    - thumbnails/<rulebookId>.png
