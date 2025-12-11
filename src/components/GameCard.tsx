@@ -1,0 +1,57 @@
+import Image from "next/image";
+import Link from "next/link";
+import { Card, CardContent } from "@/components/ui/card";
+
+type GameCardProps = {
+  slug: string;
+  title: string;
+  thumbnailUrl?: string | null;
+};
+
+export function GameCard({
+  slug,
+  title,
+  thumbnailUrl,
+}: GameCardProps): React.ReactElement {
+  return (
+    <Link href={`/games/${slug}`} className="group block">
+      <Card className="overflow-hidden p-0 transition-shadow hover:shadow-md">
+        {/* Thumbnail */}
+        <div className="relative aspect-[4/3] w-full bg-muted">
+          {thumbnailUrl ? (
+            <Image
+              src={thumbnailUrl}
+              alt={title}
+              fill
+              className="object-cover transition-transform group-hover:scale-[1.02]"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center">
+              <svg
+                className="h-12 w-12 text-muted-foreground/40"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+            </div>
+          )}
+        </div>
+
+        {/* Content */}
+        <CardContent className="p-4">
+          <h3 className="font-semibold leading-tight group-hover:text-primary">
+            {title}
+          </h3>
+        </CardContent>
+      </Card>
+    </Link>
+  );
+}

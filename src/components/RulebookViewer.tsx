@@ -193,24 +193,28 @@ export function RulebookViewer({
   return (
     <div className="flex h-full flex-col">
       {/* Page indicator */}
-      <div className="flex items-center justify-between border-b bg-muted/50 px-4 py-2">
+      <div className="flex items-center justify-between border-b bg-muted/50 px-3 py-2 sm:px-4">
         <span className="text-sm text-muted-foreground">
           Page {currentPage} of {pageCount}
         </span>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           <button
             onClick={() => scrollToPage(Math.max(1, currentPage - 1))}
             disabled={currentPage <= 1}
             className="rounded px-2 py-1 text-sm hover:bg-muted disabled:opacity-50"
+            aria-label="Previous page"
           >
-            ← Prev
+            <span className="sm:hidden">←</span>
+            <span className="hidden sm:inline">← Prev</span>
           </button>
           <button
             onClick={() => scrollToPage(Math.min(pageCount, currentPage + 1))}
             disabled={currentPage >= pageCount}
             className="rounded px-2 py-1 text-sm hover:bg-muted disabled:opacity-50"
+            aria-label="Next page"
           >
-            Next →
+            <span className="sm:hidden">→</span>
+            <span className="hidden sm:inline">Next →</span>
           </button>
         </div>
       </div>

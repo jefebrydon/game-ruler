@@ -52,17 +52,19 @@ export default async function GamePage({
   return (
     <main className="flex h-screen flex-col">
       {/* Header */}
-      <header className="flex items-center justify-between border-b px-4 py-3">
-        <div className="flex items-center gap-4">
+      <header className="flex items-center justify-between gap-2 border-b px-4 py-3">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-4">
           <Link
             href="/"
-            className="text-sm text-muted-foreground hover:text-foreground"
+            className="shrink-0 text-sm text-muted-foreground hover:text-foreground"
           >
-            ← Home
+            ← <span className="hidden sm:inline">Home</span>
           </Link>
-          <h1 className="text-lg font-semibold">{rulebook.title}</h1>
+          <h1 className="truncate text-base font-semibold sm:text-lg">
+            {rulebook.title}
+          </h1>
         </div>
-        <span className="text-sm text-muted-foreground">
+        <span className="shrink-0 text-sm text-muted-foreground">
           {rulebook.page_count} pages
         </span>
       </header>

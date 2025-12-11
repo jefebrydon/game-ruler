@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { ChatPanel } from "@/components/ChatPanel";
 
@@ -43,29 +43,86 @@ export function GamePageClient({
   pdfUrl,
   pageCount,
 }: GamePageClientProps): React.ReactElement {
+  const [activeTab, setActiveTab] = useState<"rulebook" | "chat">("rulebook");
+
   const handleCitationClick = useCallback((pageNumber: number) => {
-    scrollViewerToPage(pageNumber);
+    // On mobile, switch to rulebook tab when citation is clicked
+    setActiveTab("rulebook");
+    // Small delay to ensure tab switch completes before scrolling
+    setTimeout(() => scrollViewerToPage(pageNumber), 100);
   }, []);
 
   return (
-    <div className="flex flex-1 overflow-hidden">
-      {/* Left: Rulebook Viewer */}
-      <div className="flex-1 overflow-hidden border-r">
-        <RulebookViewer
-          rulebookId={rulebookId}
-          pdfUrl={pdfUrl}
-          pageCount={pageCount}
-        />
+    <>
+      {/* Desktop: Side-by-side layout */}
+      <div className="hidden flex-1 overflow-hidden md:flex">
+        {/* Left: Rulebook Viewer */}
+        <div className="flex-1 overflow-hidden border-r">
+          <RulebookViewer
+            rulebookId={rulebookId}
+            pdfUrl={pdfUrl}
+            pageCount={pageCount}
+          />
+        </div>
+
+        {/* Right: Chat Panel */}
+        <div className="w-96 flex-shrink-0">
+          <ChatPanel
+            rulebookId={rulebookId}
+            title={title}
+            onCitationClick={handleCitationClick}
+          />
+        </div>
       </div>
 
-      {/* Right: Chat Panel */}
-      <div className="w-96 flex-shrink-0">
-        <ChatPanel
-          rulebookId={rulebookId}
-          title={title}
-          onCitationClick={handleCitationClick}
-        />
+      {/* Mobile: Tab-based layout */}
+      <div className="flex flex-1 flex-col overflow-hidden md:hidden">
+        {/* Tab buttons */}
+        <div className="flex border-b">
+          <button
+            onClick={() => setActiveTab("rulebook")}
+            className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+              activeTab === "rulebook"
+                ? "border-b-2 border-primary text-primary"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Rulebook
+          </button>
+          <button
+            onClick={() => setActiveTab("chat")}
+            className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+              activeTab === "chat"
+                ? "border-b-2 border-primary text-primary"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Ask Questions
+          </button>
+        </div>
+
+        {/* Tab content */}
+        <div className="flex-1 overflow-hidden">
+          <div
+            className={`h-full ${activeTab === "rulebook" ? "block" : "hidden"}`}
+          >
+            <RulebookViewer
+              rulebookId={rulebookId}
+              pdfUrl={pdfUrl}
+              pageCount={pageCount}
+            />
+          </div>
+          <div
+            className={`h-full ${activeTab === "chat" ? "block" : "hidden"}`}
+          >
+            <ChatPanel
+              rulebookId={rulebookId}
+              title={title}
+              onCitationClick={handleCitationClick}
+            />
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
