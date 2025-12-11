@@ -14,8 +14,10 @@ export default async function GamesPage(): Promise<React.ReactElement> {
     .order("created_at", { ascending: false })
     .limit(PAGE_SIZE);
 
+  // Throw to trigger error.tsx boundary
   if (error) {
     console.error("Failed to fetch rulebooks:", error);
+    throw new Error("Failed to load games");
   }
 
   const games = rulebooks ?? [];
