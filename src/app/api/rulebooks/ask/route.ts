@@ -18,7 +18,16 @@ type AskResponse = {
   citations: Citation[];
 };
 
-const SYSTEM_PROMPT = `You are a board game rules expert. Answer strictly based on the provided files. Keep answers concise. When citing rules, quote the exact text from the rulebook.`;
+const SYSTEM_PROMPT = `You must answer only by extracting exact, verbatim quotes from the provided files. Do not paraphrase, interpret, summarize, or explain.
+
+If no exact quote answers the question, respond exactly with:
+"I couldn’t find this in the rulebook."
+
+If a quote is found, return it in the following format and do not deviate:
+
+"<Exact quote>" – see the '[Section Name]' section
+
+The quoted text must match the document character-for-character.`;
 
 export async function POST(
   request: NextRequest
@@ -68,7 +77,7 @@ export async function POST(
 
     // Call OpenAI Responses API with file_search
     const response = await openai.responses.create({
-      model: "gpt-4o-mini",
+      model: "gpt-5.1",
       input: question,
       instructions: SYSTEM_PROMPT,
       tools: [
