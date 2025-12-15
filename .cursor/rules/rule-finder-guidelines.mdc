@@ -104,11 +104,85 @@ button, input, command, card, skeleton, sonner, dialog
 
 ---
 
-## Remaining (Phase 6)
+## File Search Architecture
 
-### Phase 6 – Polish & UX
-- `/games` list with pagination
-- Mobile responsiveness
-- Loading skeletons, error states
-- SEO meta tags
-- UX improvements: upload modal, refined layouts, transitions
+**Core Design:**
+- **One rulebook = one vector store** in OpenAI
+- **Each PDF page = one text file** in that vector store (e.g., `rulebook-<id>-page-01.txt`)
+- This architecture enables **page-level citation precision** - citations map directly to page numbers
+
+**Why this works:**
+- File names encode page numbers, making citation → page mapping trivial
+- Limits citations to 1-3 pages per answer (not dozens)
+- Natural fit for rulebook Q&A where answers come from specific pages
+
+---
+
+## Citation Extraction (Critical Pattern)
+
+**How annotations work:**
+- OpenAI automatically generates `file_citation` annotations when the model cites files
+- Annotations are **NOT** in `response.output_text` (that's just a convenience string)
+- Annotations live in: `response.output[] → message → content[] → { type: "output_text", annotations: [...] }`
+
+**Extraction pattern:**
+```typescript
+for (const item of response.output) {
+  if (item.type === "message") {
+    for (const content of item.content) {
+      if (content.type === "output_text" && content.annotations) {
+        for (const annotation of content.annotations) {
+          if (annotation.type === "file_citation" && annotation.file_id) {
+            // Use annotation.file_id to map to page_number
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+**Critical rules:**
+- ✅ **DO** extract from `message.content.annotations` only
+- ❌ **DON'T** use `include: ["file_search_call.results"]` for citations (returns ALL searched files, not cited ones)
+- ❌ **DON'T** fall back to `file_search_call.results` (causes "all pages" bug)
+- ✅ **DO** require citations in SYSTEM_PROMPT: "Every answer MUST include a file citation"
+
+**Why annotations might be empty:**
+- Model wasn't prompted to cite (fix: update SYSTEM_PROMPT)
+- Parsing wrong response field (fix: use structure above)
+- Model chose not to cite (acceptable - handle gracefully in UI)
+
+---
+
+## Component Architecture Decisions
+
+**RulebookViewer:**
+- Uses `next/dynamic` with `ssr: false` to avoid pdf.js "DOMMatrix is not defined" error
+- Visibility check (`offsetParent === null`) ensures only visible instance handles scroll events
+- Manual scroll calculation (`scrollTo`) instead of `scrollIntoView` for reliability with nested containers
+- Tracks both `renderedPages` AND `renderingPages` refs to prevent canvas race conditions
+
+**GamePageClient:**
+- Renders TWO RulebookViewer instances (desktop + mobile) simultaneously
+- Uses `requestAnimationFrame` (double) for reliable timing after tab switches
+- Citation clicks trigger tab switch + scroll in sequence
+
+**ChatPanel:**
+- Uses `SmallTertiaryButton` component for citation buttons (white bg, subtle border)
+- Citation buttons labeled "Jump to Page X" for clarity
+- Auto-scrolls to first citation on answer receipt (optional UX enhancement)
+
+---
+
+## UI Component Patterns
+
+**SmallTertiaryButton:**
+- Reusable tertiary button component (`src/components/ui/small-tertiary-button.tsx`)
+- Visual style: white background, light gray border, small text, minimal hover
+- Used for citation buttons and other subtle actions
+
+**Citation Display:**
+- Citations appear as "Jump to Page X" buttons below AI answers
+- Only cited pages shown (1-3 typically), not all searched pages
+- Clicking triggers smooth scroll to PDF page with highlight effect
