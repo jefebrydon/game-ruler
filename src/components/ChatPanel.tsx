@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { SmallTertiaryButton } from "@/components/ui/small-tertiary-button";
 import type { ApiResponse } from "@/types";
 
 type Citation = {
@@ -174,17 +175,16 @@ function MessageBubble({
       >
         <p className="whitespace-pre-wrap text-sm">{message.content}</p>
 
-        {/* Citations */}
+        {/* Jump to Page buttons */}
         {message.citations && message.citations.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-1">
+          <div className="mt-3 flex flex-wrap gap-2">
             {message.citations.map((citation, idx) => (
-              <button
+              <SmallTertiaryButton
                 key={idx}
                 onClick={() => onCitationClick?.(citation.pageNumber)}
-                className="rounded bg-background/20 px-2 py-0.5 text-xs hover:bg-background/30"
               >
-                Page {citation.pageNumber}
-              </button>
+                Jump to Page {citation.pageNumber}
+              </SmallTertiaryButton>
             ))}
           </div>
         )}

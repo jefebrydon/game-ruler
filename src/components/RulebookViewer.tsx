@@ -20,10 +20,12 @@ export function RulebookViewer({
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [highlightedPage, setHighlightedPage] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const pageRefs = useRef<Map<number, HTMLCanvasElement>>(new Map());
   const renderedPages = useRef<Set<number>>(new Set());
   const renderingPages = useRef<Set<number>>(new Set());
+  const highlightTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Load PDF document
   useEffect(() => {
@@ -155,20 +157,84 @@ export function RulebookViewer({
 
   // Scroll to a specific page
   const scrollToPage = useCallback((pageNum: number): void => {
-    const pageContainer = containerRef.current?.querySelector(
+    const container = containerRef.current;
+    if (!container) {
+      console.log("[RulebookViewer] scrollToPage: no container");
+      return;
+    }
+    
+    const pageContainer = container.querySelector(
       `[data-page="${pageNum}"]`
-    );
-    pageContainer?.scrollIntoView({ behavior: "smooth", block: "start" });
+    ) as HTMLElement | null;
+    
+    console.log("[RulebookViewer] scrollToPage called:", {
+      pageNum,
+      hasContainer: !!container,
+      hasPageContainer: !!pageContainer,
+      containerScrollTop: container.scrollTop,
+      containerScrollHeight: container.scrollHeight,
+    });
+    
+    if (pageContainer) {
+      // Use manual scroll calculation for reliability with nested containers
+      const containerRect = container.getBoundingClientRect();
+      const pageRect = pageContainer.getBoundingClientRect();
+      const scrollOffset = pageRect.top - containerRect.top + container.scrollTop;
+      
+      console.log("[RulebookViewer] Scrolling:", {
+        pageRect: { top: pageRect.top },
+        containerRect: { top: containerRect.top },
+        currentScrollTop: container.scrollTop,
+        targetScrollTop: scrollOffset,
+      });
+      
+      container.scrollTo({
+        top: scrollOffset,
+        behavior: "smooth",
+      });
+    }
   }, []);
 
   // Expose scrollToPage to parent via a custom event
   useEffect(() => {
     const handler = (e: CustomEvent<{ pageNumber: number }>): void => {
-      scrollToPage(e.detail.pageNumber);
+      const container = containerRef.current;
+      const pageNum = e.detail.pageNumber;
+      
+      // Debug logging
+      console.log("[RulebookViewer] scrollToPage event received:", {
+        pageNum,
+        hasContainer: !!container,
+        offsetParent: container?.offsetParent,
+        isVisible: container?.offsetParent !== null,
+      });
+
+      // Only handle if this instance is visible (offsetParent is null when display: none)
+      if (!container || container.offsetParent === null) {
+        console.log("[RulebookViewer] Skipping - container not visible");
+        return;
+      }
+
+      console.log("[RulebookViewer] Scrolling to page", pageNum);
+      scrollToPage(pageNum);
+      
+      // Clear any existing timeout
+      if (highlightTimeoutRef.current) {
+        clearTimeout(highlightTimeoutRef.current);
+      }
+      
+      // Set highlighted page and auto-dismiss after 3 seconds
+      setHighlightedPage(pageNum);
+      highlightTimeoutRef.current = setTimeout(() => {
+        setHighlightedPage(null);
+      }, 3000);
     };
     window.addEventListener("scrollToPage" as keyof WindowEventMap, handler as EventListener);
     return () => {
       window.removeEventListener("scrollToPage" as keyof WindowEventMap, handler as EventListener);
+      if (highlightTimeoutRef.current) {
+        clearTimeout(highlightTimeoutRef.current);
+      }
     };
   }, [scrollToPage]);
 
@@ -230,7 +296,11 @@ export function RulebookViewer({
             <div
               key={pageNum}
               data-page={pageNum}
-              className="w-full rounded-lg bg-white shadow-md"
+              className={`w-full rounded-lg bg-white shadow-md transition-shadow duration-300 ${
+                highlightedPage === pageNum
+                  ? "ring-4 ring-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+                  : ""
+              }`}
             >
               <canvas
                 ref={(el) => {

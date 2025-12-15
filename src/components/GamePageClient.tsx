@@ -46,10 +46,16 @@ export function GamePageClient({
   const [activeTab, setActiveTab] = useState<"rulebook" | "chat">("rulebook");
 
   const handleCitationClick = useCallback((pageNumber: number) => {
+    console.log("[GamePageClient] handleCitationClick called:", pageNumber);
     // On mobile, switch to rulebook tab when citation is clicked
     setActiveTab("rulebook");
-    // Small delay to ensure tab switch completes before scrolling
-    setTimeout(() => scrollViewerToPage(pageNumber), 100);
+    // Wait for React to render and paint before scrolling
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        console.log("[GamePageClient] Dispatching scrollViewerToPage:", pageNumber);
+        scrollViewerToPage(pageNumber);
+      });
+    });
   }, []);
 
   return (

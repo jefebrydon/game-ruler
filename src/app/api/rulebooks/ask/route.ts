@@ -18,16 +18,16 @@ type AskResponse = {
   citations: Citation[];
 };
 
-const SYSTEM_PROMPT = `You must answer only by extracting exact, verbatim quotes from the provided files. Do not paraphrase, interpret, summarize, or explain.
+const SYSTEM_PROMPT = `You are a board game rules assistant. Answer questions using ONLY information from the provided rulebook files.
 
-If no exact quote answers the question, respond exactly with:
-"I couldn’t find this in the rulebook."
+IMPORTANT: Every answer MUST include a file citation. The system will automatically link your citations to the correct page.
 
-If a quote is found, return it in the following format and do not deviate:
+Rules:
+1. Quote the relevant rule text exactly as written in the file.
+2. Keep answers concise - quote only what's needed to answer the question.
+3. If you cannot find the answer in the files, say: "I couldn't find this in the rulebook."
 
-"<Exact quote>" – see the '[Section Name]' section
-
-The quoted text must match the document character-for-character.`;
+Always cite the source file when quoting rules.`;
 
 export async function POST(
   request: NextRequest
@@ -97,12 +97,18 @@ export async function POST(
       );
     }
 
-    // Extract file IDs from annotations in the output
+    // Debug: Log full response structure
+    console.log("[Ask API] response.output:", JSON.stringify(response.output, null, 2));
+
+    // Extract file IDs from annotations only (NOT from file_search_call.results)
     const fileIds = new Set<string>();
+    
     for (const item of response.output) {
+      // Extract from message annotations - this is where file_citation entries appear
       if (item.type === "message") {
         for (const content of item.content) {
           if (content.type === "output_text" && content.annotations) {
+            console.log("[Ask API] Found annotations:", content.annotations.length);
             for (const annotation of content.annotations) {
               if (annotation.type === "file_citation" && annotation.file_id) {
                 fileIds.add(annotation.file_id);
@@ -112,6 +118,8 @@ export async function POST(
         }
       }
     }
+    
+    console.log("[Ask API] Extracted fileIds from annotations:", Array.from(fileIds));
 
     // Resolve file IDs to page numbers
     const citations: Citation[] = [];

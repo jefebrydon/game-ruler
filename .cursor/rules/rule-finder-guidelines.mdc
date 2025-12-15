@@ -100,7 +100,7 @@ button, input, command, card, skeleton, sonner, dialog
 - **pdf.js SSR fix**: Use `next/dynamic` with `ssr: false` for components importing pdfjs-dist (avoids "DOMMatrix is not defined")
 - **pdf.js worker**: Load from unpkg with `.mjs` extension: `https://unpkg.com/pdfjs-dist@${version}/build/pdf.worker.min.mjs`
 - **Canvas race condition**: Track both `renderedPages` AND `renderingPages` refs to prevent concurrent renders to same canvas
-- **OpenAI Responses API**: `vector_store_ids` goes inside the tool object, model is `gpt-4o-mini`
+- **OpenAI Responses API**: `vector_store_ids` goes inside the tool object, model is `gpt-5.1` (do not change this model)
 
 ---
 
