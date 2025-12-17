@@ -3,129 +3,35 @@ alwaysApply: true
 ---
 # Rule-Finder Project Guidelines
 
+> Full documentation: **[AGENTS.md](../../AGENTS.md)**
+
 ## Stack
 - Next.js 16 App Router, TypeScript strict mode
 - Tailwind CSS v4 (mobile-first), Shadcn/ui components
-- Supabase (Postgres + Storage), OpenAI Responses API
+- Supabase (Postgres + Storage), OpenAI Responses API, Gemini
 - Deployed on Vercel
-
-## Installed Shadcn Components
-button, input, command, card, skeleton, sonner, dialog
 
 ## Code Patterns
 
-**React:**
-- Server Components by default; Client Components only when interactivity required
-- Use existing Shadcn components before creating custom ones
-- Loading, error, and empty states must be handled explicitly
+**React:** Server Components default; Client Components only when needed. Handle loading/error/empty states.
 
-**API Routes:**
-- Validate input at the boundary
-- Return typed responses: `{ data }` on success, `{ error: string }` on failure
-- Keep orchestration in routes, business logic in `lib/`
+**API Routes:** Validate input, return `{ data }` or `{ error: string }`. Use `ApiResponse<T>` type.
 
-**Supabase:**
-- Use typed helpers in `lib/supabase/`, not raw client calls
-- All queries go through server-side client with service role for writes
+**TypeScript:** Explicit return types. Prefer discriminated unions over optional fields.
 
-**TypeScript:**
-- Explicit return types on all exported functions
-- Prefer discriminated unions over optional fields for state
-- Use `ApiResponse<T>` type for all API responses (discriminated union)
-
-**Files:**
-- Components: `components/<ComponentName>.tsx`
-- API helpers: `lib/<domain>.ts`
-- Types: `types/database.ts` (Supabase), `types/index.ts` (shared app types)
+**Files:** Components in `components/`, helpers in `lib/<domain>.ts`, types in `types/`.
 
 ## Key Constraints
-- Vercel has 4.5MB request body limit—never POST raw PDFs through API routes
-- 1 PDF page = 1 OpenAI file (for citation mapping)
-- `pdf.js` runs client-side for parsing and rendering
 
----
+- **Vercel 4.5MB limit** — never POST raw PDFs through API routes
+- **1 PDF page = 1 OpenAI file** — enables page-level citation mapping
+- **pdf.js client-side only** — use `next/dynamic` with `ssr: false`
 
-## Completed (Phases 1-5)
+## Critical Patterns (Do Not Break)
 
-### Database Schema (Supabase)
-- `rulebooks` table: id, slug, title, year, pdf_url, thumbnail_url, page_count, status, openai_vector_store_id, ingested_pages, error_message
-- `rulebook_pages` table: id, rulebook_id, page_number, openai_file_id, text_length
-- Storage bucket `rulebooks` (public): `pdfs/`, `thumbnails/`
+### Citation Extraction
+Extract from `message.content.annotations` only. Do NOT use `file_search_call.results` (returns all searched files, not cited ones).
 
-### API Routes
-| Route | Purpose |
-|-------|---------|
-| `GET /api/rulebooks/search?q=` | Search by title (ilike), returns ready rulebooks only |
-| `POST /api/rulebooks/create-upload` | Creates DB row, returns signed upload URL for PDF |
-| `POST /api/rulebooks/ingest-batch` | Creates OpenAI vector store + files, parallelized |
-| `POST /api/rulebooks/upload-assets` | Uploads thumbnail to storage |
-| `POST /api/rulebooks/ask` | Queries OpenAI Responses API with file_search, resolves citations to page numbers |
-
-### Key Components
-- `GameSearch` — Debounced (250ms) search using Shadcn Command, navigates to `/games/[slug]`
-- `UploadForm` — Full upload flow with progress UI, handles all 5 steps
-- `ChatPanel` — Chat UI with message history, sends questions to `/api/rulebooks/ask`, displays citations as clickable page links
-- `RulebookViewer` — PDF viewer using pdf.js with lazy rendering via IntersectionObserver, page navigation, scroll-to-page support
-- `GamePageClient` — Client wrapper that wires citation clicks to PDF viewer scroll (uses dynamic import with `ssr: false` to avoid DOMMatrix error)
-
-### Lib Utilities
-- `lib/supabase/server.ts` — `createServerClient()` with service role
-- `lib/openai.ts` — `getOpenAIClient()` singleton
-- `lib/pdf-parser.ts` — Client-side `parsePDF(file)` extracts text, generates thumbnail
-- `lib/slug.ts` — `generateSlug(title)` creates unique URL-friendly slugs
-
-### Upload Flow (Critical Path)
-1. `create-upload` → DB row + signed URL
-2. Client uploads PDF directly to Supabase Storage (bypasses Vercel limit)
-3. Client parses PDF with pdf.js → text + thumbnail
-4. Client sends batches (25 pages) to `ingest-batch`
-5. `ingest-batch` uploads files in parallel, uses `vectorStores.fileBatches.createAndPoll()`
-6. `upload-assets` saves thumbnail, updates pdf_url
-7. Redirect to `/games/[slug]`
-
-### Types to Reuse
-- `ApiResponse<T>` — Discriminated union for API responses
-- `RulebookSearchResult` — Search result shape
-
-### Ask Flow (Q&A)
-1. User submits question via `ChatPanel`
-2. `POST /api/rulebooks/ask` fetches `openai_vector_store_id` from DB
-3. Calls OpenAI Responses API with `file_search` tool and `vector_store_ids`
-4. Extracts `output_text` and `file_citation` annotations
-5. Resolves `file_id` → `page_number` via `rulebook_pages` table
-6. Returns answer + citations array
-7. `ChatPanel` displays answer, citation clicks trigger `scrollViewerToPage()`
-
-### Key Patterns Learned
-- **pdf.js SSR fix**: Use `next/dynamic` with `ssr: false` for components importing pdfjs-dist (avoids "DOMMatrix is not defined")
-- **pdf.js worker**: Load from unpkg with `.mjs` extension: `https://unpkg.com/pdfjs-dist@${version}/build/pdf.worker.min.mjs`
-- **Canvas race condition**: Track both `renderedPages` AND `renderingPages` refs to prevent concurrent renders to same canvas
-- **OpenAI Responses API**: `vector_store_ids` goes inside the tool object, model is `gpt-5.1` (do not change this model)
-
----
-
-## File Search Architecture
-
-**Core Design:**
-- **One rulebook = one vector store** in OpenAI
-- **Each PDF page = one text file** in that vector store (e.g., `rulebook-<id>-page-01.txt`)
-- This architecture enables **page-level citation precision** - citations map directly to page numbers
-
-**Why this works:**
-- File names encode page numbers, making citation → page mapping trivial
-- Limits citations to 1-3 pages per answer (not dozens)
-- Natural fit for rulebook Q&A where answers come from specific pages
-
----
-
-## Citation Extraction (Critical Pattern)
-
-**How annotations work:**
-- OpenAI automatically generates `file_citation` annotations when the model cites files
-- Annotations are **NOT** in `response.output_text` (that's just a convenience string)
-- Annotations live in: `response.output[] → message → content[] → { type: "output_text", annotations: [...] }`
-
-**Extraction pattern:**
 ```typescript
 for (const item of response.output) {
   if (item.type === "message") {
@@ -133,7 +39,7 @@ for (const item of response.output) {
       if (content.type === "output_text" && content.annotations) {
         for (const annotation of content.annotations) {
           if (annotation.type === "file_citation" && annotation.file_id) {
-            // Use annotation.file_id to map to page_number
+            // Map file_id → page_number via rulebook_pages table
           }
         }
       }
@@ -142,47 +48,15 @@ for (const item of response.output) {
 }
 ```
 
-**Critical rules:**
-- ✅ **DO** extract from `message.content.annotations` only
-- ❌ **DON'T** use `include: ["file_search_call.results"]` for citations (returns ALL searched files, not cited ones)
-- ❌ **DON'T** fall back to `file_search_call.results` (causes "all pages" bug)
-- ✅ **DO** require citations in SYSTEM_PROMPT: "Every answer MUST include a file citation"
+### pdf.js SSR Fix
+```typescript
+const RulebookViewer = dynamic(() => import("@/components/RulebookViewer"), {
+  ssr: false,
+});
+```
 
-**Why annotations might be empty:**
-- Model wasn't prompted to cite (fix: update SYSTEM_PROMPT)
-- Parsing wrong response field (fix: use structure above)
-- Model chose not to cite (acceptable - handle gracefully in UI)
+### Canvas Race Condition
+Track both `renderedPages` AND `renderingPages` refs to prevent concurrent renders.
 
----
-
-## Component Architecture Decisions
-
-**RulebookViewer:**
-- Uses `next/dynamic` with `ssr: false` to avoid pdf.js "DOMMatrix is not defined" error
-- Visibility check (`offsetParent === null`) ensures only visible instance handles scroll events
-- Manual scroll calculation (`scrollTo`) instead of `scrollIntoView` for reliability with nested containers
-- Tracks both `renderedPages` AND `renderingPages` refs to prevent canvas race conditions
-
-**GamePageClient:**
-- Renders TWO RulebookViewer instances (desktop + mobile) simultaneously
-- Uses `requestAnimationFrame` (double) for reliable timing after tab switches
-- Citation clicks trigger tab switch + scroll in sequence
-
-**ChatPanel:**
-- Uses `SmallTertiaryButton` component for citation buttons (white bg, subtle border)
-- Citation buttons labeled "Jump to Page X" for clarity
-- Auto-scrolls to first citation on answer receipt (optional UX enhancement)
-
----
-
-## UI Component Patterns
-
-**SmallTertiaryButton:**
-- Reusable tertiary button component (`src/components/ui/small-tertiary-button.tsx`)
-- Visual style: white background, light gray border, small text, minimal hover
-- Used for citation buttons and other subtle actions
-
-**Citation Display:**
-- Citations appear as "Jump to Page X" buttons below AI answers
-- Only cited pages shown (1-3 typically), not all searched pages
-- Clicking triggers smooth scroll to PDF page with highlight effect
+### OpenAI Model
+Use `gpt-5.1` for ask endpoint. Do not change.
