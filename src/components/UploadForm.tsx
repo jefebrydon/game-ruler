@@ -8,12 +8,14 @@ import { toast } from "sonner";
 import type { ApiResponse } from "@/types";
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
-const BATCH_SIZE = 25; // Pages per batch (parallelized uploads allow larger batches)
+const BATCH_SIZE = 25; // Pages per batch for OpenAI ingestion
+const GEMINI_CONCURRENCY = 5; // Parallel Gemini requests
 
 type UploadState =
   | { step: "form" }
   | { step: "uploading"; message: string }
   | { step: "parsing"; message: string }
+  | { step: "processing"; current: number; total: number }
   | { step: "ingesting"; current: number; total: number }
   | { step: "finalizing"; message: string }
   | { step: "error"; message: string };
@@ -99,14 +101,58 @@ export function UploadForm(): React.ReactElement {
         throw new Error("Failed to upload PDF to storage");
       }
 
-      // Step 3: Parse PDF locally
-      setState({ step: "parsing", message: "Parsing PDF..." });
+      // Step 3: Parse PDF — splits into single-page PDFs
+      setState({ step: "parsing", message: "Splitting PDF into pages..." });
 
       // Dynamic import to avoid SSR issues
       const { parsePDF } = await import("@/lib/pdf-parser");
-      const { pageCount, pages, thumbnailBlob } = await parsePDF(file);
+      const { pageCount, singlePages, thumbnailBlob } = await parsePDF(file);
 
-      // Step 4: Ingest pages in batches
+      // Step 4: Process each page through Gemini
+      const processedPages: { pageNumber: number; text: string }[] = [];
+
+      for (let i = 0; i < singlePages.length; i += GEMINI_CONCURRENCY) {
+        const batch = singlePages.slice(i, i + GEMINI_CONCURRENCY);
+
+        setState({
+          step: "processing",
+          current: i,
+          total: pageCount,
+        });
+
+        const batchResults = await Promise.all(
+          batch.map(async (page) => {
+            const res = await fetch("/api/rulebooks/process-page", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                pageNumber: page.pageNumber,
+                pdfBase64: page.pdfBase64,
+              }),
+            });
+
+            const json: ApiResponse<{
+              pageNumber: number;
+              processedText: string;
+            }> = await res.json();
+
+            if (json.error || !json.data) {
+              throw new Error(
+                json.error ?? `Failed to process page ${page.pageNumber}`
+              );
+            }
+
+            return {
+              pageNumber: json.data.pageNumber,
+              text: json.data.processedText,
+            };
+          })
+        );
+
+        processedPages.push(...batchResults);
+      }
+
+      // Step 5: Ingest Gemini-processed pages to OpenAI
       const totalBatches = Math.ceil(pageCount / BATCH_SIZE);
 
       for (let batchIndex = 0; batchIndex < totalBatches; batchIndex++) {
@@ -119,7 +165,7 @@ export function UploadForm(): React.ReactElement {
           total: pageCount,
         });
 
-        const batchPages = pages
+        const batchPages = processedPages
           .filter((p) => p.pageNumber >= startPage && p.pageNumber <= endPage)
           .map((p) => ({
             pageNumber: p.pageNumber,
@@ -149,12 +195,12 @@ export function UploadForm(): React.ReactElement {
         }
       }
 
-      // Step 5: Upload thumbnail
+      // Step 6: Upload thumbnail
       setState({ step: "finalizing", message: "Uploading thumbnail..." });
 
       await uploadThumbnail(rulebookId, thumbnailBlob);
 
-      // Step 6: Navigate to game page
+      // Step 7: Navigate to game page
       toast.success("Rulebook uploaded successfully!");
       router.push(`/games/${slug}`);
     } catch (err) {
@@ -187,7 +233,8 @@ export function UploadForm(): React.ReactElement {
       {/* Year */}
       <div className="space-y-2">
         <label htmlFor="year" className="text-sm font-medium">
-          Publication Year <span className="text-muted-foreground">(optional)</span>
+          Publication Year{" "}
+          <span className="text-muted-foreground">(optional)</span>
         </label>
         <Input
           id="year"
@@ -215,9 +262,7 @@ export function UploadForm(): React.ReactElement {
           disabled={isProcessing}
           required
         />
-        <p className="text-xs text-muted-foreground">
-          PDF only, max 50MB
-        </p>
+        <p className="text-xs text-muted-foreground">PDF only, max 50MB</p>
         {file && (
           <p className="text-sm text-muted-foreground">
             Selected: {file.name} ({(file.size / 1024 / 1024).toFixed(1)}MB)
@@ -267,12 +312,12 @@ function ProgressDisplay({ state }: { state: UploadState }): React.ReactElement 
           <span className="text-sm">{state.message}</span>
         </div>
       );
-    case "ingesting":
-      const percent = Math.round((state.current / state.total) * 100);
+    case "processing": {
+      const processPercent = Math.round((state.current / state.total) * 100);
       return (
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span>Processing pages...</span>
+            <span>Processing pages with AI...</span>
             <span>
               {state.current} / {state.total}
             </span>
@@ -280,11 +325,31 @@ function ProgressDisplay({ state }: { state: UploadState }): React.ReactElement 
           <div className="h-2 rounded-full bg-muted">
             <div
               className="h-full rounded-full bg-primary transition-all"
-              style={{ width: `${percent}%` }}
+              style={{ width: `${processPercent}%` }}
             />
           </div>
         </div>
       );
+    }
+    case "ingesting": {
+      const ingestPercent = Math.round((state.current / state.total) * 100);
+      return (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-sm">
+            <span>Indexing pages...</span>
+            <span>
+              {state.current} / {state.total}
+            </span>
+          </div>
+          <div className="h-2 rounded-full bg-muted">
+            <div
+              className="h-full rounded-full bg-primary transition-all"
+              style={{ width: `${ingestPercent}%` }}
+            />
+          </div>
+        </div>
+      );
+    }
     default:
       return <></>;
   }

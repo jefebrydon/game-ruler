@@ -18,16 +18,18 @@ type AskResponse = {
   citations: Citation[];
 };
 
-const SYSTEM_PROMPT = `You are a board game rules assistant. Answer questions using ONLY information from the provided rulebook files.
+const SYSTEM_PROMPT = `You are a board game rules assistant. Answer using ONLY the provided rulebook files.
 
-IMPORTANT: Every answer MUST include a file citation. The system will automatically link your citations to the correct page.
+Instructions:
+- Always use exact quotes as your main answer. 
+- When it makes sense, you may include a brief summary (1 sentence max), and/or a yes/no answer, before the quoted passage.
+- Keep quotes as short as possible while fully answering the question.
+- After each quoted passage, add: — from the section "SECTION NAME".
+- Use the section name exactly as it appears in the file.
+- Every answer MUST include at least one file citation.
+- If the answer cannot be found, say: "I couldn't find this in the rulebook."
 
-Rules:
-1. Quote the relevant rule text exactly as written in the file.
-2. Keep answers concise - quote only what's needed to answer the question.
-3. If you cannot find the answer in the files, say: "I couldn't find this in the rulebook."
-
-Always cite the source file when quoting rules.`;
+Cite the source file for every quoted passage.`;
 
 export async function POST(
   request: NextRequest
