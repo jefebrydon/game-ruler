@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SmallTertiaryButton } from "@/components/ui/small-tertiary-button";
+import { ArrowUpIcon } from "lucide-react";
 import type { ApiResponse } from "@/types";
 
 type Citation = {
@@ -146,8 +147,13 @@ export function ChatPanel({
             placeholder="Ask about the rules..."
             disabled={isLoading}
           />
-          <Button type="submit" disabled={isLoading || !input.trim()}>
-            Send
+          <Button
+            type="submit"
+            disabled={isLoading || !input.trim()}
+            size="icon"
+            className="flex-shrink-0"
+          >
+            <ArrowUpIcon className="h-4 w-4" />
           </Button>
         </div>
       </form>
