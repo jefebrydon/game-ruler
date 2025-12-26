@@ -17,7 +17,6 @@ export function RulebookViewer({
   pageCount,
 }: RulebookViewerProps): React.ReactElement {
   const [pdf, setPdf] = useState<pdfjsLib.PDFDocumentProxy | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [highlightedPage, setHighlightedPage] = useState<number | null>(null);
@@ -129,32 +128,6 @@ export function RulebookViewer({
     return () => observer.disconnect();
   }, [pdf, renderPage]);
 
-  // Track current page on scroll
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const handleScroll = (): void => {
-      const pages = container.querySelectorAll("[data-page]");
-      const containerRect = container.getBoundingClientRect();
-      const containerMiddle = containerRect.top + containerRect.height / 2;
-
-      for (const page of pages) {
-        const pageRect = page.getBoundingClientRect();
-        if (pageRect.top <= containerMiddle && pageRect.bottom >= containerMiddle) {
-          const pageNum = parseInt(page.getAttribute("data-page") ?? "0", 10);
-          if (pageNum > 0) {
-            setCurrentPage(pageNum);
-            break;
-          }
-        }
-      }
-    };
-
-    container.addEventListener("scroll", handleScroll);
-    return () => container.removeEventListener("scroll", handleScroll);
-  }, []);
-
   // Scroll to a specific page
   const scrollToPage = useCallback((pageNum: number): void => {
     const container = containerRef.current;
@@ -259,33 +232,6 @@ export function RulebookViewer({
 
   return (
     <div className="flex h-full flex-col">
-      {/* Page indicator */}
-      <div className="flex items-center justify-between border-b bg-muted/50 px-3 py-2 sm:px-4">
-        <span className="text-sm text-muted-foreground">
-          Page {currentPage} of {pageCount}
-        </span>
-        <div className="flex items-center gap-1 sm:gap-2">
-          <button
-            onClick={() => scrollToPage(Math.max(1, currentPage - 1))}
-            disabled={currentPage <= 1}
-            className="rounded px-2 py-1 text-sm hover:bg-muted disabled:opacity-50"
-            aria-label="Previous page"
-          >
-            <span className="sm:hidden">←</span>
-            <span className="hidden sm:inline">← Prev</span>
-          </button>
-          <button
-            onClick={() => scrollToPage(Math.min(pageCount, currentPage + 1))}
-            disabled={currentPage >= pageCount}
-            className="rounded px-2 py-1 text-sm hover:bg-muted disabled:opacity-50"
-            aria-label="Next page"
-          >
-            <span className="sm:hidden">→</span>
-            <span className="hidden sm:inline">Next →</span>
-          </button>
-        </div>
-      </div>
-
       {/* PDF pages */}
       <div
         ref={containerRef}
