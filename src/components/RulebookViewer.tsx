@@ -34,14 +34,25 @@ export function RulebookViewer({
       try {
         setIsLoading(true);
         setError(null);
+        
+        // Add timeout to prevent hanging
+        const timeoutId = setTimeout(() => {
+          if (!cancelled) {
+            setError("PDF loading timed out. Please check your connection and try again.");
+            setIsLoading(false);
+          }
+        }, 30000); // 30 second timeout
+        
         const loadedPdf = await pdfjsLib.getDocument(pdfUrl).promise;
+        clearTimeout(timeoutId);
+        
         if (!cancelled) {
           setPdf(loadedPdf);
         }
       } catch (err) {
         console.error("Failed to load PDF:", err);
         if (!cancelled) {
-          setError("Failed to load PDF");
+          setError(err instanceof Error ? err.message : "Failed to load PDF");
         }
       } finally {
         if (!cancelled) {
@@ -244,7 +255,7 @@ export function RulebookViewer({
               data-page={pageNum}
               className={`w-full rounded-lg bg-white shadow-md transition-shadow duration-300 ${
                 highlightedPage === pageNum
-                  ? "ring-4 ring-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+                  ? "ring-4 ring-orange-400 shadow-[0_0_20px_rgba(186,56,29,0.5)]"
                   : ""
               }`}
             >

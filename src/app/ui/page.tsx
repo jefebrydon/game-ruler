@@ -35,7 +35,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SmallTertiaryButton } from "@/components/ui/small-tertiary-button";
 import { Toaster } from "@/components/ui/sonner";
 
 function Section({
@@ -46,7 +45,7 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="border-b border-gray-200 py-12">
+    <section className="border-b border-stone-300 py-12">
       <h2 className="mb-6 text-2xl font-semibold">{title}</h2>
       {children}
     </section>
@@ -62,7 +61,7 @@ function ExampleGroup({
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-xs text-gray-500">{label}</span>
+      <span className="text-xs text-stone-500">{label}</span>
       <div className="flex flex-wrap items-center gap-2">{children}</div>
     </div>
   );
@@ -74,7 +73,7 @@ function ButtonSection() {
       <div className="grid gap-6">
         {/* Variants */}
         <div>
-          <h3 className="mb-4 text-sm font-medium text-gray-700">Variants</h3>
+          <h3 className="mb-4 text-sm font-medium text-stone-600">Variants</h3>
           <div className="flex flex-wrap gap-4">
             <ExampleGroup label="default">
               <Button variant="default">Default</Button>
@@ -99,7 +98,7 @@ function ButtonSection() {
 
         {/* Sizes */}
         <div>
-          <h3 className="mb-4 text-sm font-medium text-gray-700">Sizes</h3>
+          <h3 className="mb-4 text-sm font-medium text-stone-600">Sizes</h3>
           <div className="flex flex-wrap items-end gap-4">
             <ExampleGroup label="sm">
               <Button size="sm">Small</Button>
@@ -115,7 +114,7 @@ function ButtonSection() {
 
         {/* Icon buttons */}
         <div>
-          <h3 className="mb-4 text-sm font-medium text-gray-700">
+          <h3 className="mb-4 text-sm font-medium text-stone-600">
             Icon Buttons
           </h3>
           <div className="flex flex-wrap items-end gap-4">
@@ -139,7 +138,7 @@ function ButtonSection() {
 
         {/* With icons */}
         <div>
-          <h3 className="mb-4 text-sm font-medium text-gray-700">With Icons</h3>
+          <h3 className="mb-4 text-sm font-medium text-stone-600">With Icons</h3>
           <div className="flex flex-wrap gap-4">
             <ExampleGroup label="leading icon">
               <Button>
@@ -158,7 +157,7 @@ function ButtonSection() {
 
         {/* States */}
         <div>
-          <h3 className="mb-4 text-sm font-medium text-gray-700">States</h3>
+          <h3 className="mb-4 text-sm font-medium text-stone-600">States</h3>
           <div className="flex flex-wrap gap-4">
             <ExampleGroup label="disabled">
               <Button disabled>Disabled</Button>
@@ -181,7 +180,7 @@ function CardSection() {
               <CardDescription>Card description goes here.</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-stone-600">
                 This is the card content area.
               </p>
             </CardContent>
@@ -195,7 +194,7 @@ function CardSection() {
               <CardDescription>A card with a footer.</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-600">Card content here.</p>
+              <p className="text-sm text-stone-600">Card content here.</p>
             </CardContent>
             <CardFooter>
               <Button size="sm">Action</Button>
@@ -215,7 +214,7 @@ function CardSection() {
               </CardAction>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-600">Card content here.</p>
+              <p className="text-sm text-stone-600">Card content here.</p>
             </CardContent>
           </Card>
         </ExampleGroup>
@@ -282,7 +281,7 @@ function DialogSection() {
                 </DialogDescription>
               </DialogHeader>
               <div className="py-4">
-                <p className="text-sm text-gray-600">Dialog content goes here.</p>
+                <p className="text-sm text-stone-600">Dialog content goes here.</p>
               </div>
               <DialogFooter>
                 <DialogClose asChild>
@@ -400,29 +399,6 @@ function SkeletonSection() {
   );
 }
 
-function SmallTertiaryButtonSection() {
-  return (
-    <Section title="SmallTertiaryButton">
-      <div className="flex flex-wrap gap-4">
-        <ExampleGroup label="default">
-          <SmallTertiaryButton>Button</SmallTertiaryButton>
-        </ExampleGroup>
-
-        <ExampleGroup label="with icon">
-          <SmallTertiaryButton>
-            <SettingsIcon className="h-3 w-3" />
-            Settings
-          </SmallTertiaryButton>
-        </ExampleGroup>
-
-        <ExampleGroup label="disabled">
-          <SmallTertiaryButton disabled>Disabled</SmallTertiaryButton>
-        </ExampleGroup>
-      </div>
-    </Section>
-  );
-}
-
 function SonnerSection() {
   return (
     <Section title="Sonner (Toast)">
@@ -494,12 +470,12 @@ function SonnerSection() {
 
 export default function UIPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-stone-50">
       <Toaster />
       <div className="mx-auto max-w-5xl px-6 py-12">
         <header className="mb-12">
           <h1 className="text-4xl font-bold">UI Components</h1>
-          <p className="mt-2 text-gray-600">
+          <p className="mt-2 text-stone-600">
             A showcase of all available UI components and their variants.
           </p>
         </header>
@@ -511,10 +487,12 @@ export default function UIPage() {
           <DialogSection />
           <InputSection />
           <SkeletonSection />
-          <SmallTertiaryButtonSection />
           <SonnerSection />
         </main>
       </div>
     </div>
   );
 }
+
+
+

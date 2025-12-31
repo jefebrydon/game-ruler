@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { SmallTertiaryButton } from "@/components/ui/small-tertiary-button";
 import { ArrowUpIcon } from "lucide-react";
 import type { ApiResponse } from "@/types";
 
@@ -181,16 +180,19 @@ function MessageBubble({
       >
         <p className="whitespace-pre-wrap text-sm">{message.content}</p>
 
-        {/* Jump to Page buttons */}
+        {/* Jump to Page links */}
         {message.citations && message.citations.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-2">
             {message.citations.map((citation, idx) => (
-              <SmallTertiaryButton
+              <Button
                 key={idx}
+                variant="link"
+                size="sm"
+                className="h-auto p-0 text-xs"
                 onClick={() => onCitationClick?.(citation.pageNumber)}
               >
                 Jump to Page {citation.pageNumber}
-              </SmallTertiaryButton>
+              </Button>
             ))}
           </div>
         )}

@@ -19,5 +19,27 @@ export function createServerClient() {
 
   return createClient<Database>(supabaseUrl, serviceRoleKey, {
     auth: { persistSession: false },
+    db: {
+      schema: "public",
+    },
+    global: {
+      fetch: (url, options = {}) => {
+        // Add timeout to prevent hanging queries
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => {
+          controller.abort();
+        }, 10000); // 10 second timeout
+        
+        // Use existing signal if provided, otherwise use timeout signal
+        const signal = options?.signal || controller.signal;
+        
+        return fetch(url, {
+          ...options,
+          signal,
+        }).finally(() => {
+          clearTimeout(timeoutId);
+        });
+      },
+    },
   });
 }
