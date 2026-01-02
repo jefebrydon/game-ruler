@@ -76,7 +76,7 @@ export function GameSearch(): React.ReactElement {
       />
       <CommandList>
         {isLoading && (
-          <div className="py-6 text-center text-sm text-muted-foreground">
+          <div className="py-6 text-center text-paragraph-sm text-muted-foreground">
             Searching…
           </div>
         )}
@@ -95,9 +95,9 @@ export function GameSearch(): React.ReactElement {
                 className="cursor-pointer"
               >
                 <div className="flex flex-col">
-                  <span className="font-medium">{game.title}</span>
+                  <span className="text-paragraph-bold">{game.title}</span>
                   {game.year && (
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-paragraph-sm text-muted-foreground">
                       {game.year}
                     </span>
                   )}

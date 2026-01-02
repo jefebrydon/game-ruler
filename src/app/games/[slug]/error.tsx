@@ -20,8 +20,8 @@ export default function GameError({
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-4">
       <div className="text-center">
-        <h1 className="text-2xl font-bold">Failed to load rulebook</h1>
-        <p className="mt-2 text-muted-foreground">
+        <h1 className="text-h2">Failed to load rulebook</h1>
+        <p className="mt-2 text-paragraph text-muted-foreground">
           We couldn&apos;t load this rulebook. It may have been removed or there
           was a server error.
         </p>

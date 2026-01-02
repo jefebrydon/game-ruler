@@ -28,14 +28,14 @@ export default async function GamesPage(): Promise<React.ReactElement> {
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">All Games</h1>
-            <p className="mt-1 text-muted-foreground">
+            <h1 className="text-h2">All Games</h1>
+            <p className="mt-1 text-paragraph text-muted-foreground">
               Browse rulebooks that have been uploaded to Rule Finder.
             </p>
           </div>
           <Link
             href="/upload"
-            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+            className="rounded-full brass-gradient px-4 py-2 text-paragraph-bold text-primary-foreground"
           >
             Upload Rulebook
           </Link>
@@ -55,12 +55,12 @@ export default async function GamesPage(): Promise<React.ReactElement> {
           </div>
         ) : (
           <div className="rounded-lg border border-dashed p-12 text-center">
-            <p className="text-muted-foreground">
+            <p className="text-paragraph text-muted-foreground">
               No rulebooks have been uploaded yet.
             </p>
             <Link
               href="/upload"
-              className="mt-4 inline-block text-sm text-primary underline-offset-4 hover:underline"
+              className="mt-4 inline-block text-paragraph-sm text-primary underline-offset-4 hover:underline"
             >
               Upload the first one →
             </Link>

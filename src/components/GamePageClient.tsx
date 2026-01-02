@@ -14,7 +14,7 @@ const RulebookViewer = dynamic(
     ssr: false,
     loading: () => (
       <div className="flex h-full items-center justify-center">
-        <div className="flex items-center gap-2 text-muted-foreground">
+        <div className="flex items-center gap-2 text-paragraph text-muted-foreground">
           <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
           Loading PDF viewer...
         </div>
@@ -87,7 +87,7 @@ export function GamePageClient({
         <div className="flex border-b">
           <button
             onClick={() => setActiveTab("rulebook")}
-            className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+            className={`flex-1 px-4 py-3 text-paragraph-bold transition-colors ${
               activeTab === "rulebook"
                 ? "border-b-2 border-primary text-primary"
                 : "text-muted-foreground hover:text-foreground"
@@ -97,7 +97,7 @@ export function GamePageClient({
           </button>
           <button
             onClick={() => setActiveTab("chat")}
-            className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+            className={`flex-1 px-4 py-3 text-paragraph-bold transition-colors ${
               activeTab === "chat"
                 ? "border-b-2 border-primary text-primary"
                 : "text-muted-foreground hover:text-foreground"

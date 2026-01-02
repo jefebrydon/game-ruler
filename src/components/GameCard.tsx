@@ -47,7 +47,7 @@ export function GameCard({
 
         {/* Content */}
         <CardContent className="p-4">
-          <h3 className="font-semibold leading-tight group-hover:text-primary">
+          <h3 className="text-paragraph-bold leading-tight group-hover:text-primary">
             {title}
           </h3>
         </CardContent>

@@ -217,7 +217,7 @@ export function UploadForm(): React.ReactElement {
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Title */}
       <div className="space-y-2">
-        <label htmlFor="title" className="text-sm font-medium">
+        <label htmlFor="title" className="text-paragraph-bold">
           Game Title <span className="text-destructive">*</span>
         </label>
         <Input
@@ -232,9 +232,9 @@ export function UploadForm(): React.ReactElement {
 
       {/* Year */}
       <div className="space-y-2">
-        <label htmlFor="year" className="text-sm font-medium">
+        <label htmlFor="year" className="text-paragraph-bold">
           Publication Year{" "}
-          <span className="text-muted-foreground">(optional)</span>
+          <span className="text-paragraph text-muted-foreground">(optional)</span>
         </label>
         <Input
           id="year"
@@ -250,7 +250,7 @@ export function UploadForm(): React.ReactElement {
 
       {/* File Input */}
       <div className="space-y-2">
-        <label htmlFor="file" className="text-sm font-medium">
+        <label htmlFor="file" className="text-paragraph-bold">
           PDF Rulebook <span className="text-destructive">*</span>
         </label>
         <Input
@@ -262,9 +262,9 @@ export function UploadForm(): React.ReactElement {
           disabled={isProcessing}
           required
         />
-        <p className="text-xs text-muted-foreground">PDF only, max 50MB</p>
+        <p className="text-paragraph-sm text-muted-foreground">PDF only, max 50MB</p>
         {file && (
-          <p className="text-sm text-muted-foreground">
+          <p className="text-paragraph-sm text-muted-foreground">
             Selected: {file.name} ({(file.size / 1024 / 1024).toFixed(1)}MB)
           </p>
         )}
@@ -280,7 +280,7 @@ export function UploadForm(): React.ReactElement {
       {/* Error */}
       {state.step === "error" && (
         <div className="rounded-lg border border-destructive bg-destructive/10 p-4">
-          <p className="text-sm text-destructive">{state.message}</p>
+          <p className="text-paragraph-sm text-destructive">{state.message}</p>
           <Button
             type="button"
             variant="outline"
@@ -309,14 +309,14 @@ function ProgressDisplay({ state }: { state: UploadState }): React.ReactElement 
       return (
         <div className="flex items-center gap-3">
           <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          <span className="text-sm">{state.message}</span>
+          <span className="text-paragraph-sm">{state.message}</span>
         </div>
       );
     case "processing": {
       const processPercent = Math.round((state.current / state.total) * 100);
       return (
         <div className="space-y-2">
-          <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center justify-between text-paragraph-sm">
             <span>Processing pages with AI...</span>
             <span>
               {state.current} / {state.total}
@@ -335,7 +335,7 @@ function ProgressDisplay({ state }: { state: UploadState }): React.ReactElement 
       const ingestPercent = Math.round((state.current / state.total) * 100);
       return (
         <div className="space-y-2">
-          <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center justify-between text-paragraph-sm">
             <span>Indexing pages...</span>
             <span>
               {state.current} / {state.total}

@@ -6,8 +6,11 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  
+  /* Typography */
+  --font-heading: var(--font-fraunces);
+  --font-body: var(--font-nunito-sans);
+  
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -42,10 +45,13 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   
-  /* Custom Orange palette */
-  --color-orange-300: #DD7E48;
-  --color-orange-400: #BA381D;
-  --color-orange-450: #AC290E;
+  /* Custom Brass palette */
+  --color-brass-300: #A08151;
+  --color-brass-400: #715936;
+  --color-brass-450: #61441A;
+  
+  /* Custom Beige palette */
+  --color-beige-100: #F7F4EE;
   
   /* Custom Stone palette */
   --color-stone-50: #FAFAF9;
@@ -62,7 +68,7 @@
   --radius: 0.625rem;
   
   /* Background & Foreground */
-  --background: #FFFFFF;
+  --background: #F7F4EE;
   --foreground: #292524;
   
   /* Card */
@@ -73,48 +79,48 @@
   --popover: #FFFFFF;
   --popover-foreground: #292524;
   
-  /* Primary - Orange 400 */
-  --primary: #BA381D;
+  /* Primary - Brass 400 */
+  --primary: #715936;
   --primary-foreground: #FFFFFF;
   
   /* Secondary - Stone 100 */
   --secondary: #F5F5F4;
   --secondary-foreground: #292524;
   
-  /* Muted - Stone 100 */
-  --muted: #F5F5F4;
+  /* Muted - Beige 100 */
+  --muted: #F7F4EE;
   --muted-foreground: #57534D;
   
   /* Accent - Stone 200 */
   --accent: #EBE8E6;
   --accent-foreground: #292524;
   
-  /* Destructive - Orange 450 */
-  --destructive: #AC290E;
+  /* Destructive - Brass 450 */
+  --destructive: #61441A;
   
   /* Border & Input - Stone 300 */
   --border: #D6D3D1;
   --input: #D6D3D1;
   
-  /* Ring - Orange 400 */
-  --ring: #BA381D;
+  /* Ring - Brass 400 */
+  --ring: #715936;
   
   /* Chart colors mapped to palette */
-  --chart-1: #BA381D;
-  --chart-2: #DD7E48;
+  --chart-1: #715936;
+  --chart-2: #A08151;
   --chart-3: #57534D;
   --chart-4: #79716B;
   --chart-5: #A6A09B;
   
   /* Sidebar */
-  --sidebar: #FAFAF9;
+  --sidebar: #F7F4EE;
   --sidebar-foreground: #292524;
-  --sidebar-primary: #BA381D;
+  --sidebar-primary: #715936;
   --sidebar-primary-foreground: #FFFFFF;
   --sidebar-accent: #EBE8E6;
   --sidebar-accent-foreground: #292524;
   --sidebar-border: #D6D3D1;
-  --sidebar-ring: #BA381D;
+  --sidebar-ring: #715936;
 }
 
 .dark {
@@ -130,8 +136,8 @@
   --popover: #292524;
   --popover-foreground: #FAFAF9;
   
-  /* Primary - Orange 300 (lighter for dark mode) */
-  --primary: #DD7E48;
+  /* Primary - Brass 300 (lighter for dark mode) */
+  --primary: #A08151;
   --primary-foreground: #292524;
   
   /* Secondary */
@@ -146,19 +152,19 @@
   --accent: #57534D;
   --accent-foreground: #FAFAF9;
   
-  /* Destructive - Orange 300 for visibility in dark */
-  --destructive: #DD7E48;
+  /* Destructive - Brass 300 for visibility in dark */
+  --destructive: #A08151;
   
   /* Border & Input */
   --border: rgba(250, 250, 249, 0.1);
   --input: rgba(250, 250, 249, 0.15);
   
   /* Ring */
-  --ring: #DD7E48;
+  --ring: #A08151;
   
   /* Chart colors */
-  --chart-1: #DD7E48;
-  --chart-2: #BA381D;
+  --chart-1: #A08151;
+  --chart-2: #715936;
   --chart-3: #A6A09B;
   --chart-4: #79716B;
   --chart-5: #57534D;
@@ -166,12 +172,12 @@
   /* Sidebar */
   --sidebar: #292524;
   --sidebar-foreground: #FAFAF9;
-  --sidebar-primary: #DD7E48;
+  --sidebar-primary: #A08151;
   --sidebar-primary-foreground: #292524;
   --sidebar-accent: #57534D;
   --sidebar-accent-foreground: #FAFAF9;
   --sidebar-border: rgba(250, 250, 249, 0.1);
-  --sidebar-ring: #DD7E48;
+  --sidebar-ring: #A08151;
 }
 
 @layer base {
@@ -184,10 +190,69 @@
 }
 
 @layer utilities {
-  .orange-gradient {
-    background: linear-gradient(to right, #DD7F48, #BA371D);
+  .brass-gradient {
+    background: linear-gradient(to right, #A08151, #715936);
   }
-  .orange-gradient-hover {
-    background: linear-gradient(to right, #D56E3E, #AC290E);
+  .brass-gradient:hover:not(:disabled) {
+    background: linear-gradient(to right, #917549, #61441A);
+  }
+  .brass-gradient-hover {
+    background: linear-gradient(to right, #917549, #61441A);
+  }
+  .brass-gradient-light {
+    background: linear-gradient(to right, #D2BB9A, #A48B64);
+  }
+  
+  /* Typography utilities */
+  
+  /* Headings - Fraunces */
+  .text-h1 {
+    font-family: var(--font-fraunces), serif;
+    font-size: 40px;
+    line-height: 1.2;
+    font-weight: 600;
+  }
+  
+  .text-h2 {
+    font-family: var(--font-fraunces), serif;
+    font-size: 30px;
+    line-height: 1.25;
+    font-weight: 600;
+  }
+  
+  .text-h3 {
+    font-family: var(--font-fraunces), serif;
+    font-size: 20px;
+    line-height: 1.3;
+    font-weight: 600;
+  }
+  
+  /* Body & Supporting Text - Nunito Sans */
+  .text-subhead {
+    font-family: var(--font-nunito-sans), sans-serif;
+    font-size: 20px;
+    line-height: 1.4;
+    font-weight: 400;
+  }
+  
+  .text-paragraph-bold {
+    font-family: var(--font-nunito-sans), sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 700;
+  }
+  
+  .text-paragraph {
+    font-family: var(--font-nunito-sans), sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 400;
+  }
+  
+  .text-paragraph-sm {
+    font-family: var(--font-nunito-sans), sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    font-weight: 400;
   }
 }

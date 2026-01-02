@@ -20,8 +20,8 @@ export default function GamesError({
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-4">
       <div className="text-center">
-        <h1 className="text-2xl font-bold">Something went wrong</h1>
-        <p className="mt-2 text-muted-foreground">
+        <h1 className="text-h2">Something went wrong</h1>
+        <p className="mt-2 text-paragraph text-muted-foreground">
           We couldn&apos;t load the games list. Please try again.
         </p>
         <div className="mt-6 flex items-center justify-center gap-4">

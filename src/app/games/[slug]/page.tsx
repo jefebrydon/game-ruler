@@ -30,8 +30,8 @@ export default async function GamePage({
     return (
       <main className="flex min-h-screen flex-col items-center justify-center px-4">
         <div className="text-center">
-          <h1 className="text-2xl font-bold">{rulebook.title}</h1>
-          <p className="mt-4 text-muted-foreground">
+          <h1 className="text-h2">{rulebook.title}</h1>
+          <p className="mt-4 text-paragraph text-muted-foreground">
             {rulebook.status === "ingesting"
               ? "This rulebook is still being processed. Please check back shortly."
               : rulebook.status === "pending_ingest"
@@ -40,7 +40,7 @@ export default async function GamePage({
           </p>
           <Link
             href="/"
-            className="mt-6 inline-block text-sm text-primary underline-offset-4 hover:underline"
+            className="mt-6 inline-block text-paragraph-sm text-primary underline-offset-4 hover:underline"
           >
             ← Back to home
           </Link>
@@ -56,15 +56,13 @@ export default async function GamePage({
         <div className="flex min-w-0 items-center gap-2 sm:gap-4">
           <Link
             href="/"
-            className="shrink-0 text-sm text-muted-foreground hover:text-foreground"
+            className="shrink-0 text-paragraph-sm text-muted-foreground hover:text-foreground"
           >
             ← <span className="hidden sm:inline">Home</span>
           </Link>
-          <h1 className="truncate text-base font-semibold sm:text-lg">
-            {rulebook.title}
-          </h1>
+          <h1 className="truncate text-h3">{rulebook.title}</h1>
         </div>
-        <span className="shrink-0 text-sm text-muted-foreground">
+        <span className="shrink-0 text-paragraph-sm text-muted-foreground">
           {rulebook.page_count} pages
         </span>
       </header>

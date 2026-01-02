@@ -8,13 +8,13 @@ export default function UploadPage(): React.ReactElement {
         {/* Back link */}
         <Link
           href="/"
-          className="mb-6 inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
+          className="mb-6 inline-flex items-center text-paragraph-sm text-muted-foreground hover:text-foreground"
         >
           ← Back to home
         </Link>
 
-        <h1 className="text-2xl font-bold">Upload Rulebook</h1>
-        <p className="mt-2 text-muted-foreground">
+        <h1 className="text-h2">Upload Rulebook</h1>
+        <p className="mt-2 text-paragraph text-muted-foreground">
           Upload a PDF rulebook to create an AI-powered rules assistant.
         </p>
 

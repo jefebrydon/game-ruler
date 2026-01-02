@@ -103,8 +103,8 @@ export function ChatPanel({
     <div className="flex h-full flex-col">
       {/* Header */}
       <div className="border-b p-4">
-        <h2 className="font-semibold">Ask about {title}</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <h2 className="text-h3">Ask about {title}</h2>
+        <p className="mt-1 text-paragraph-sm text-muted-foreground">
           Get answers with page citations
         </p>
       </div>
@@ -113,7 +113,7 @@ export function ChatPanel({
       <div className="flex-1 overflow-y-auto p-4">
         {messages.length === 0 ? (
           <div className="flex h-full items-center justify-center">
-            <p className="text-center text-sm text-muted-foreground">
+            <p className="text-center text-paragraph-sm text-muted-foreground">
               Ask a question about the rules
             </p>
           </div>
@@ -127,7 +127,7 @@ export function ChatPanel({
               />
             ))}
             {isLoading && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2 text-paragraph-sm text-muted-foreground">
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
                 Thinking...
               </div>
@@ -178,7 +178,7 @@ function MessageBubble({
             : "bg-muted text-foreground"
         }`}
       >
-        <p className="whitespace-pre-wrap text-sm">{message.content}</p>
+        <p className="whitespace-pre-wrap text-paragraph-sm">{message.content}</p>
 
         {/* Jump to Page links */}
         {message.citations && message.citations.length > 0 && (
@@ -188,7 +188,7 @@ function MessageBubble({
                 key={idx}
                 variant="link"
                 size="sm"
-                className="h-auto p-0 text-xs"
+                className="h-auto p-0 text-paragraph-sm"
                 onClick={() => onCitationClick?.(citation.pageNumber)}
               >
                 Jump to Page {citation.pageNumber}

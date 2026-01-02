@@ -225,7 +225,7 @@ export function RulebookViewer({
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
-        <div className="flex items-center gap-2 text-muted-foreground">
+        <div className="flex items-center gap-2 text-paragraph text-muted-foreground">
           <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
           Loading PDF...
         </div>
@@ -236,7 +236,7 @@ export function RulebookViewer({
   if (error) {
     return (
       <div className="flex h-full items-center justify-center">
-        <p className="text-destructive">{error}</p>
+        <p className="text-paragraph text-destructive">{error}</p>
       </div>
     );
   }
@@ -255,7 +255,7 @@ export function RulebookViewer({
               data-page={pageNum}
               className={`w-full rounded-lg bg-white shadow-md transition-shadow duration-300 ${
                 highlightedPage === pageNum
-                  ? "ring-4 ring-orange-400 shadow-[0_0_20px_rgba(186,56,29,0.5)]"
+                  ? "ring-4 ring-brass-400 shadow-[0_0_20px_rgba(113,89,54,0.5)]"
                   : ""
               }`}
             >
