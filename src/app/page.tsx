@@ -17,11 +17,11 @@ export default function HomePage(): React.ReactElement {
           <source src="/World_BG.mp4" type="video/mp4" />
         </video>
 
-        <div className="mx-auto w-full max-w-2xl text-center">
-          <h1 className="text-h1">Rule Finder</h1>
-          <p className="mt-4 text-subhead text-muted-foreground">
-            Upload a board-game rulebook and instantly get an AI-powered rules
-            assistant with page-level citations.
+        <div className="mx-auto w-full max-w-[344px] text-left">
+          <h1 className="text-h1 text-white text-shadow-dark">Find Rules Fast</h1>
+          <p className="mt-4 text-paragraph-bold text-white text-shadow-dark">
+            Get answers about board game rules. See sources directly in the
+            rulebook.
           </p>
 
           {/* Game Search */}
