@@ -36,6 +36,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Toaster } from "@/components/ui/sonner";
+import { SearchBar } from "@/components/SearchBar";
 
 function Section({
   title,
@@ -399,6 +400,28 @@ function SkeletonSection() {
   );
 }
 
+function SearchBarSection() {
+  return (
+    <Section title="SearchBar">
+      <div className="grid gap-6">
+        <ExampleGroup label="default">
+          <SearchBar />
+        </ExampleGroup>
+
+        <ExampleGroup label="custom placeholder">
+          <SearchBar placeholder="Search rulebooks..." />
+        </ExampleGroup>
+
+        <ExampleGroup label="full width (try typing to see dropdown)">
+          <div className="w-full max-w-md">
+            <SearchBar />
+          </div>
+        </ExampleGroup>
+      </div>
+    </Section>
+  );
+}
+
 function SonnerSection() {
   return (
     <Section title="Sonner (Toast)">
@@ -486,6 +509,7 @@ export default function UIPage() {
           <CommandSection />
           <DialogSection />
           <InputSection />
+          <SearchBarSection />
           <SkeletonSection />
           <SonnerSection />
         </main>

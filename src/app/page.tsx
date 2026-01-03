@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { GameSearch } from "@/components/GameSearch";
+import { SearchBar } from "@/components/SearchBar";
 
 export default function HomePage(): React.ReactElement {
   return (
@@ -26,12 +26,7 @@ export default function HomePage(): React.ReactElement {
 
           {/* Game Search */}
           <div className="mt-8">
-            <p className="mb-3 text-paragraph-sm text-muted-foreground">
-              Select a Game
-            </p>
-            <div className="mx-auto max-w-md">
-              <GameSearch />
-            </div>
+            <SearchBar className="w-full" />
           </div>
 
           {/* Upload CTA */}
