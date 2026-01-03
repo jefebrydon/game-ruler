@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 import type { ApiResponse, RulebookSearchResult } from "@/types";
@@ -17,11 +17,16 @@ export function SearchBar({
   className = "",
 }: SearchBarProps): React.ReactElement {
   const router = useRouter();
+  const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<RulebookSearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+
+  const handleContainerClick = (): void => {
+    inputRef.current?.focus();
+  };
 
   const searchRulebooks = useCallback(async (searchQuery: string) => {
     if (!searchQuery.trim()) {
@@ -71,10 +76,14 @@ export function SearchBar({
   return (
     <div className={`relative ${className}`}>
       {/* Search Input */}
-      <div className="brass-gradient-light rounded-[99px] p-[4px]">
+      <div
+        onClick={handleContainerClick}
+        className="brass-gradient-light cursor-text rounded-[99px] p-[4px]"
+      >
         <div className="flex items-center gap-3 rounded-[95px] bg-white px-5 py-4">
           <Search className="size-5 shrink-0 text-brass-300" />
           <input
+            ref={inputRef}
             type="text"
             placeholder={placeholder}
             value={query}
