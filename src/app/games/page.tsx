@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createServerClient } from "@/lib/supabase/server";
 import { GameCard } from "@/components/GameCard";
+import { Header } from "@/components/Header";
 
 const PAGE_SIZE = 20;
 
@@ -23,7 +24,9 @@ export default async function GamesPage(): Promise<React.ReactElement> {
   const games = rulebooks ?? [];
 
   return (
-    <main className="min-h-screen px-4 py-8">
+    <>
+      <Header />
+      <main className="min-h-screen px-4 py-8">
       <div className="mx-auto max-w-6xl">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
@@ -68,5 +71,6 @@ export default async function GamesPage(): Promise<React.ReactElement> {
         )}
       </div>
     </main>
+    </>
   );
 }

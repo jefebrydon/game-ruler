@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Fraunces, Nunito_Sans } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
-import { Header } from "@/components/Header";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -32,7 +31,6 @@ export default function RootLayout({
       <body
         className={`${fraunces.variable} ${nunitoSans.variable} font-body antialiased`}
       >
-        <Header />
         {children}
         <Toaster />
       </body>

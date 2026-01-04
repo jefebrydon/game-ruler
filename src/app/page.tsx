@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { SearchBar } from "@/components/SearchBar";
 import { GameTile } from "@/components/GameTile";
+import { Header } from "@/components/Header";
 import { createServerClient } from "@/lib/supabase/server";
 
 export default async function HomePage(): Promise<React.ReactElement> {
@@ -17,7 +18,9 @@ export default async function HomePage(): Promise<React.ReactElement> {
   const games = rulebooks ?? [];
 
   return (
-    <main>
+    <>
+      <Header floating />
+      <main>
       {/* Hero Section */}
       <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4">
         {/* Background Video */}
@@ -90,5 +93,6 @@ export default async function HomePage(): Promise<React.ReactElement> {
         </div>
       </section>
     </main>
+    </>
   );
 }

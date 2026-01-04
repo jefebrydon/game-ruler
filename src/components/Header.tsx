@@ -2,10 +2,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-export function Header(): React.ReactElement {
+type HeaderProps = {
+  /** When true, header overlaps content (for homepage). When false, header is inline above content. */
+  floating?: boolean;
+};
+
+export function Header({ floating = false }: HeaderProps): React.ReactElement {
   return (
     <header
-      className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-2"
+      className={`${
+        floating ? "absolute top-0 left-0 right-0" : "relative"
+      } z-50 flex items-center justify-between px-4 py-2`}
       style={{
         backgroundColor: "rgba(245, 245, 244, 0.7)",
         borderBottom: "0.75px solid #EBE8E6",
