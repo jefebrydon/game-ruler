@@ -68,6 +68,209 @@ function ExampleGroup({
   );
 }
 
+function TextStylesSection() {
+  return (
+    <Section title="Text Styles">
+      <div className="grid gap-6">
+        <ExampleGroup label="text-h1">
+          <h1 className="text-h1">Heading 1</h1>
+        </ExampleGroup>
+        <ExampleGroup label="text-h2">
+          <h2 className="text-h2">Heading 2</h2>
+        </ExampleGroup>
+        <ExampleGroup label="text-h3">
+          <h3 className="text-h3">Heading 3</h3>
+        </ExampleGroup>
+        <ExampleGroup label="text-subhead">
+          <p className="text-subhead">Subhead Text</p>
+        </ExampleGroup>
+        <ExampleGroup label="text-paragraph-bold">
+          <p className="text-paragraph-bold">Bold Paragraph Text</p>
+        </ExampleGroup>
+        <ExampleGroup label="text-paragraph">
+          <p className="text-paragraph">Regular Paragraph Text</p>
+        </ExampleGroup>
+        <ExampleGroup label="text-paragraph-sm">
+          <p className="text-paragraph-sm">Small Paragraph Text</p>
+        </ExampleGroup>
+      </div>
+    </Section>
+  );
+}
+
+function ColorsSection() {
+  const stoneColors = [
+    { name: "stone-50", hex: "#FAFAF9", class: "bg-stone-50" },
+    { name: "stone-100", hex: "#F5F5F4", class: "bg-stone-100" },
+    { name: "stone-200", hex: "#EBE8E6", class: "bg-stone-200" },
+    { name: "stone-300", hex: "#D6D3D1", class: "bg-stone-300" },
+    { name: "stone-400", hex: "#A6A09B", class: "bg-stone-400" },
+    { name: "stone-500", hex: "#79716B", class: "bg-stone-500" },
+    { name: "stone-600", hex: "#57534D", class: "bg-stone-600" },
+    { name: "stone-800", hex: "#292524", class: "bg-stone-800" },
+  ];
+
+  const brassColors = [
+    { name: "brass-300", hex: "#A08151", class: "bg-brass-300" },
+    { name: "brass-400", hex: "#715936", class: "bg-brass-400" },
+    { name: "brass-450", hex: "#61441A", class: "bg-brass-450" },
+  ];
+
+  const beigeColors = [
+    { name: "beige-100", hex: "#F7F4EE", class: "bg-beige-100" },
+  ];
+
+  const semanticColors = [
+    { name: "primary", hex: "#715936", class: "bg-primary" },
+    { name: "primary-foreground", hex: "#FFFFFF", class: "bg-primary-foreground" },
+    { name: "secondary", hex: "#F5F5F4", class: "bg-secondary" },
+    { name: "secondary-foreground", hex: "#292524", class: "bg-secondary-foreground" },
+    { name: "muted", hex: "#F7F4EE", class: "bg-muted" },
+    { name: "muted-foreground", hex: "#57534D", class: "bg-muted-foreground" },
+    { name: "accent", hex: "#EBE8E6", class: "bg-accent" },
+    { name: "accent-foreground", hex: "#292524", class: "bg-accent-foreground" },
+    { name: "destructive", hex: "#61441A", class: "bg-destructive" },
+    { name: "background", hex: "#F7F4EE", class: "bg-background" },
+    { name: "foreground", hex: "#292524", class: "bg-foreground" },
+    { name: "card", hex: "#FFFFFF", class: "bg-card" },
+    { name: "card-foreground", hex: "#292524", class: "bg-card-foreground" },
+    { name: "popover", hex: "#FFFFFF", class: "bg-popover" },
+    { name: "popover-foreground", hex: "#292524", class: "bg-popover-foreground" },
+    { name: "border", hex: "#D6D3D1", class: "bg-border" },
+    { name: "input", hex: "#D6D3D1", class: "bg-input" },
+    { name: "ring", hex: "#715936", class: "bg-ring" },
+  ];
+
+  const gradients = [
+    {
+      name: "brass-gradient",
+      hex: "linear-gradient(to right, #A08151, #715936)",
+      class: "brass-gradient",
+    },
+    {
+      name: "brass-gradient-hover",
+      hex: "linear-gradient(to right, #917549, #61441A)",
+      class: "brass-gradient-hover",
+    },
+    {
+      name: "brass-gradient-light",
+      hex: "linear-gradient(to right, #D2BB9A, #A48B64)",
+      class: "brass-gradient-light",
+    },
+    {
+      name: "text-brass-gradient",
+      hex: "linear-gradient(to right, #A08151, #715936)",
+      class: "text-brass-gradient",
+      isText: true,
+    },
+  ];
+
+  function ColorSwatch({
+    name,
+    hex,
+    class: className,
+    isGradient = false,
+    isText = false,
+  }: {
+    name: string;
+    hex: string;
+    class: string;
+    isGradient?: boolean;
+    isText?: boolean;
+  }) {
+    return (
+      <div className="flex flex-col gap-2">
+        <div
+          className="h-16 w-full rounded-md border border-stone-300"
+          style={
+            isGradient
+              ? { background: hex }
+              : isText
+                ? {}
+                : { backgroundColor: hex }
+          }
+        >
+          {isText && (
+            <div className="flex h-full items-center justify-center">
+              <span className={className}>Brass Gradient</span>
+            </div>
+          )}
+        </div>
+        <div className="text-xs">
+          <div className="font-medium">{name}</div>
+          <div className="text-stone-500">{hex}</div>
+          <div className="text-stone-400">{className}</div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <Section title="Colors">
+      <div className="grid gap-8">
+        {/* Stone Colors */}
+        <div>
+          <h3 className="mb-4 text-sm font-medium text-stone-600">Stone Colors</h3>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8">
+            {stoneColors.map((color) => (
+              <ColorSwatch key={color.name} {...color} />
+            ))}
+          </div>
+        </div>
+
+        {/* Brass Colors */}
+        <div>
+          <h3 className="mb-4 text-sm font-medium text-stone-600">Brass Colors</h3>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-3">
+            {brassColors.map((color) => (
+              <ColorSwatch key={color.name} {...color} />
+            ))}
+          </div>
+        </div>
+
+        {/* Beige Colors */}
+        <div>
+          <h3 className="mb-4 text-sm font-medium text-stone-600">Beige Colors</h3>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+            {beigeColors.map((color) => (
+              <ColorSwatch key={color.name} {...color} />
+            ))}
+          </div>
+        </div>
+
+        {/* Semantic Colors */}
+        <div>
+          <h3 className="mb-4 text-sm font-medium text-stone-600">
+            Semantic Colors
+          </h3>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+            {semanticColors.map((color) => (
+              <ColorSwatch key={color.name} {...color} />
+            ))}
+          </div>
+        </div>
+
+        {/* Gradients */}
+        <div>
+          <h3 className="mb-4 text-sm font-medium text-stone-600">Gradients</h3>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
+            {gradients.map((gradient) => (
+              <ColorSwatch
+                key={gradient.name}
+                name={gradient.name}
+                hex={gradient.hex}
+                class={gradient.class}
+                isGradient={true}
+                isText={gradient.isText}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </Section>
+  );
+}
+
 function ButtonSection() {
   return (
     <Section title="Button">
@@ -504,6 +707,8 @@ export default function UIPage() {
         </header>
 
         <main>
+          <TextStylesSection />
+          <ColorsSection />
           <ButtonSection />
           <CardSection />
           <CommandSection />

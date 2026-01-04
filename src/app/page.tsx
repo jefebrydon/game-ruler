@@ -1,8 +1,21 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { SearchBar } from "@/components/SearchBar";
+import { GameTile } from "@/components/GameTile";
+import { createServerClient } from "@/lib/supabase/server";
 
-export default function HomePage(): React.ReactElement {
+export default async function HomePage(): Promise<React.ReactElement> {
+  const supabase = createServerClient();
+
+  const { data: rulebooks } = await supabase
+    .from("rulebooks")
+    .select("id, slug, title, thumbnail_url")
+    .eq("status", "ready")
+    .order("created_at", { ascending: false })
+    .limit(20);
+
+  const games = rulebooks ?? [];
+
   return (
     <main>
       {/* Hero Section */}
@@ -19,39 +32,61 @@ export default function HomePage(): React.ReactElement {
 
         <div className="mx-auto w-full max-w-[344px] text-left">
           <h1 className="text-h1 text-white text-shadow-dark">Find Rules Fast</h1>
-          <p className="mt-4 text-paragraph-bold text-white text-shadow-dark">
-            Get answers about board game rules. See sources directly in the
-            rulebook.
+          <p className="mt-4 text-subhead text-white text-shadow-dark">
+            Clarify board game rules.
+            <br />
+            See answers in the rulebook.
           </p>
 
           {/* Game Search */}
           <div className="mt-8">
             <SearchBar className="w-full" />
           </div>
-
-          {/* Upload CTA */}
-          <div className="mt-8">
-            <Button asChild size="lg">
-              <Link href="/upload">Upload New Rulebook</Link>
-            </Button>
-          </div>
-
-          {/* Browse Games Link */}
-          <div className="mt-4">
-            <Link
-              href="/games"
-              className="text-paragraph-sm text-muted-foreground underline-offset-4 hover:underline"
-            >
-              Browse all games
-            </Link>
-          </div>
         </div>
       </section>
 
       {/* Board Games Section */}
-      <section className="px-4 py-16">
-        <div className="mx-auto max-w-6xl">
-          {/* Content to be added */}
+      <section className="w-full py-16">
+        <div className="mx-auto max-w-[1080px] px-6 sm:px-0">
+          {/* Header row */}
+          <div className="mb-6 flex items-center justify-between">
+            <h2 className="text-h2 text-brass-gradient">Board Games</h2>
+            <Button asChild variant="secondary">
+              <Link href="/upload">Upload Rulebook</Link>
+            </Button>
+          </div>
+
+          {/* Game Grid */}
+          {games.length > 0 ? (
+            <div
+              className="grid gap-6"
+              style={{
+                gridTemplateColumns: "repeat(auto-fit, minmax(140px, 170px))",
+                justifyContent: "start",
+              }}
+            >
+              {games.map((game) => (
+                <GameTile
+                  key={game.id}
+                  slug={game.slug}
+                  title={game.title}
+                  thumbnailUrl={game.thumbnail_url}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-lg border border-dashed p-12 text-center">
+              <p className="text-paragraph text-muted-foreground">
+                No rulebooks have been uploaded yet.
+              </p>
+              <Link
+                href="/upload"
+                className="mt-4 inline-block text-paragraph-sm text-primary underline-offset-4 hover:underline"
+              >
+                Upload the first one →
+              </Link>
+            </div>
+          )}
         </div>
       </section>
     </main>

@@ -203,6 +203,13 @@
     background: linear-gradient(to right, #D2BB9A, #A48B64);
   }
   
+  .text-brass-gradient {
+    background: linear-gradient(to right, #A08151, #715936);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
   /* Typography utilities */
   
   /* Headings - Fraunces */
@@ -232,7 +239,7 @@
     font-family: var(--font-nunito-sans), sans-serif;
     font-size: 20px;
     line-height: 1.4;
-    font-weight: 400;
+    font-weight: 600;
   }
   
   .text-paragraph-bold {
