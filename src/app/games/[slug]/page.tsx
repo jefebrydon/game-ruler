@@ -50,14 +50,6 @@ export default async function GamePage({
     <>
       <Header />
       <main className="flex h-[calc(100dvh-64px)] flex-col">
-        {/* Title bar */}
-        <div className="flex items-center justify-between gap-2 border-b px-4 py-3">
-          <h1 className="truncate text-h3">{rulebook.title}</h1>
-          <span className="shrink-0 text-paragraph-sm text-muted-foreground">
-            {rulebook.page_count} pages
-          </span>
-        </div>
-
         {/* Main content */}
         <GamePageClient
           rulebookId={rulebook.id}

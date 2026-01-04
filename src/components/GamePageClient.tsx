@@ -62,21 +62,21 @@ export function GamePageClient({
     <>
       {/* Desktop: Side-by-side layout */}
       <div className="hidden flex-1 overflow-hidden md:flex">
-        {/* Left: Rulebook Viewer */}
-        <div className="flex-1 overflow-hidden border-r">
-          <RulebookViewer
-            rulebookId={rulebookId}
-            pdfUrl={pdfUrl}
-            pageCount={pageCount}
-          />
-        </div>
-
-        {/* Right: Chat Panel */}
-        <div className="w-96 flex-shrink-0">
+        {/* Left: Chat Panel */}
+        <div className="w-96 flex-shrink-0 border-r">
           <ChatPanel
             rulebookId={rulebookId}
             title={title}
             onCitationClick={handleCitationClick}
+          />
+        </div>
+
+        {/* Right: Rulebook Viewer */}
+        <div className="flex-1 overflow-hidden">
+          <RulebookViewer
+            rulebookId={rulebookId}
+            pdfUrl={pdfUrl}
+            pageCount={pageCount}
           />
         </div>
       </div>

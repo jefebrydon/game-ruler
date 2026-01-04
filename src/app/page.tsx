@@ -49,7 +49,7 @@ export default async function HomePage(): Promise<React.ReactElement> {
       </section>
 
       {/* Board Games Section */}
-      <section className="w-full px-6 py-16">
+      <section id="board-games" className="w-full px-6 py-16">
         <div className="mx-auto max-w-[1080px]">
           {/* Header row */}
           <div className="mb-6 flex items-center justify-between">

@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowUpIcon } from "lucide-react";
+import { ArrowUpIcon, ArrowLeftIcon } from "lucide-react";
 import type { ApiResponse } from "@/types";
 
 type Citation = {
@@ -38,6 +39,29 @@ export function ChatPanel({
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+
+  const handleGamesClick = (e: React.MouseEvent<HTMLButtonElement>): void => {
+    e.preventDefault();
+    
+    // If already on home page, scroll directly
+    if (window.location.pathname === "/") {
+      const element = document.getElementById("board-games");
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    } else {
+      // Navigate to home page with hash
+      router.push("/#board-games");
+      // Scroll after navigation completes
+      setTimeout(() => {
+        const element = document.getElementById("board-games");
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 300);
+    }
+  };
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
@@ -101,6 +125,19 @@ export function ChatPanel({
 
   return (
     <div className="flex h-full flex-col">
+      {/* Back to Games */}
+      <div className="border-b p-4">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleGamesClick}
+          className="!px-0 has-[>svg]:!px-0 text-brass-300 hover:bg-transparent hover:text-brass-450"
+        >
+          <ArrowLeftIcon className="h-4 w-4" />
+          Games
+        </Button>
+      </div>
+
       {/* Header */}
       <div className="border-b p-4">
         <h2 className="text-h3">Ask about {title}</h2>
