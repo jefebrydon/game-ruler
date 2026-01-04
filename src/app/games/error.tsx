@@ -26,7 +26,7 @@ export default function GamesError({
         </p>
         <div className="mt-6 flex items-center justify-center gap-4">
           <Button onClick={reset}>Try again</Button>
-          <Button variant="outline" asChild>
+          <Button variant="secondary" asChild>
             <Link href="/">Go home</Link>
           </Button>
         </div>

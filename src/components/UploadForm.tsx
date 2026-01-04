@@ -283,7 +283,7 @@ export function UploadForm(): React.ReactElement {
           <p className="text-paragraph-sm text-destructive">{state.message}</p>
           <Button
             type="button"
-            variant="outline"
+            variant="secondary"
             size="sm"
             className="mt-2"
             onClick={() => setState({ step: "form" })}

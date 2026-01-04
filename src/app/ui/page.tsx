@@ -285,9 +285,6 @@ function ButtonSection() {
             <ExampleGroup label="destructive">
               <Button variant="destructive">Destructive</Button>
             </ExampleGroup>
-            <ExampleGroup label="outline">
-              <Button variant="outline">Outline</Button>
-            </ExampleGroup>
             <ExampleGroup label="secondary">
               <Button variant="secondary">Secondary</Button>
             </ExampleGroup>
@@ -323,17 +320,17 @@ function ButtonSection() {
           </h3>
           <div className="flex flex-wrap items-end gap-4">
             <ExampleGroup label="icon-sm">
-              <Button size="icon-sm" variant="outline">
+              <Button size="icon-sm" variant="secondary">
                 <SettingsIcon />
               </Button>
             </ExampleGroup>
             <ExampleGroup label="icon">
-              <Button size="icon" variant="outline">
+              <Button size="icon" variant="secondary">
                 <SettingsIcon />
               </Button>
             </ExampleGroup>
             <ExampleGroup label="icon-lg">
-              <Button size="icon-lg" variant="outline">
+              <Button size="icon-lg" variant="secondary">
                 <SettingsIcon />
               </Button>
             </ExampleGroup>
@@ -351,7 +348,7 @@ function ButtonSection() {
               </Button>
             </ExampleGroup>
             <ExampleGroup label="trailing icon">
-              <Button variant="outline">
+              <Button variant="secondary">
                 Settings
                 <SettingsIcon />
               </Button>
@@ -474,7 +471,7 @@ function DialogSection() {
         <ExampleGroup label="basic dialog">
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="outline">Open Dialog</Button>
+              <Button variant="secondary">Open Dialog</Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
@@ -489,7 +486,7 @@ function DialogSection() {
               </div>
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button variant="outline">Cancel</Button>
+                  <Button variant="secondary">Cancel</Button>
                 </DialogClose>
                 <Button>Save Changes</Button>
               </DialogFooter>
@@ -500,7 +497,7 @@ function DialogSection() {
         <ExampleGroup label="without close button">
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="outline">No Close Button</Button>
+              <Button variant="secondary">No Close Button</Button>
             </DialogTrigger>
             <DialogContent showCloseButton={false}>
               <DialogHeader>
@@ -511,7 +508,7 @@ function DialogSection() {
               </DialogHeader>
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button variant="outline">No</Button>
+                  <Button variant="secondary">No</Button>
                 </DialogClose>
                 <DialogClose asChild>
                   <Button>Yes</Button>
@@ -631,7 +628,7 @@ function SonnerSection() {
       <div className="flex flex-wrap gap-4">
         <ExampleGroup label="success">
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={() => toast.success("Success! Operation completed.")}
           >
             Show Success
@@ -640,7 +637,7 @@ function SonnerSection() {
 
         <ExampleGroup label="error">
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={() => toast.error("Error! Something went wrong.")}
           >
             Show Error
@@ -649,7 +646,7 @@ function SonnerSection() {
 
         <ExampleGroup label="info">
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={() => toast.info("Info: Here's some information.")}
           >
             Show Info
@@ -658,7 +655,7 @@ function SonnerSection() {
 
         <ExampleGroup label="warning">
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={() => toast.warning("Warning: Be careful!")}
           >
             Show Warning
@@ -667,7 +664,7 @@ function SonnerSection() {
 
         <ExampleGroup label="loading">
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={() => {
               const id = toast.loading("Loading...");
               setTimeout(() => toast.dismiss(id), 2000);
@@ -679,7 +676,7 @@ function SonnerSection() {
 
         <ExampleGroup label="with description">
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={() =>
               toast("Event Created", {
                 description: "Your event has been scheduled for tomorrow.",
