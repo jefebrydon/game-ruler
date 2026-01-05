@@ -38,10 +38,15 @@ export function QuestionInput({
     }
   };
 
+  const handleContainerClick = () => {
+    textareaRef.current?.focus();
+  };
+
   return (
     <div
+      onClick={handleContainerClick}
       className={cn(
-        "h-16 w-full rounded-[20px] p-[4px] transition-all",
+        "h-16 w-full cursor-text rounded-[20px] p-[4px] transition-all",
         isFocused ? "brass-gradient" : "brass-gradient-light",
         disabled && "opacity-50",
         className
