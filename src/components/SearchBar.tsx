@@ -80,7 +80,7 @@ export function SearchBar({
         onClick={handleContainerClick}
         className="brass-gradient-light cursor-text rounded-[99px] p-[4px]"
       >
-        <div className="flex items-center gap-3 rounded-[95px] bg-white px-5 py-4">
+        <div className="flex items-center gap-3 rounded-[95px] bg-white px-4 py-3">
           <Search className="size-5 shrink-0 text-brass-300" />
           <input
             ref={inputRef}
