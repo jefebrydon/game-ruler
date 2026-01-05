@@ -37,6 +37,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Toaster } from "@/components/ui/sonner";
 import { SearchBar } from "@/components/SearchBar";
+import { QuestionInput } from "@/components/QuestionInput";
 
 function Section({
   title,
@@ -622,6 +623,30 @@ function SearchBarSection() {
   );
 }
 
+function QuestionInputSection() {
+  return (
+    <Section title="QuestionInput">
+      <div className="grid gap-6">
+        <ExampleGroup label="default">
+          <div className="w-full max-w-md">
+            <QuestionInput onSubmit={(v) => toast.success(`Submitted: ${v}`)} />
+          </div>
+        </ExampleGroup>
+
+        <ExampleGroup label="disabled">
+          <div className="w-full max-w-md">
+            <QuestionInput disabled />
+          </div>
+        </ExampleGroup>
+
+        <ExampleGroup label="full width">
+          <QuestionInput onSubmit={(v) => toast.success(`Submitted: ${v}`)} />
+        </ExampleGroup>
+      </div>
+    </Section>
+  );
+}
+
 function SonnerSection() {
   return (
     <Section title="Sonner (Toast)">
@@ -711,6 +736,7 @@ export default function UIPage() {
           <CommandSection />
           <DialogSection />
           <InputSection />
+          <QuestionInputSection />
           <SearchBarSection />
           <SkeletonSection />
           <SonnerSection />
