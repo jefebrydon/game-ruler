@@ -271,4 +271,8 @@
   .text-shadow-dark {
     text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
   }
+  
+  .shadow-subtle {
+    box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.05);
+  }
 }

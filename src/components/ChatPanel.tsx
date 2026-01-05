@@ -126,7 +126,7 @@ export function ChatPanel({
   return (
     <div className="flex h-full flex-col">
       {/* Back to Games */}
-      <div className="border-b p-4">
+      <div className="border-b border-stone-200 p-4">
         <Button
           variant="ghost"
           size="sm"
@@ -139,8 +139,8 @@ export function ChatPanel({
       </div>
 
       {/* Header */}
-      <div className="border-b p-4">
-        <h2 className="text-h3">Ask about {title}</h2>
+      <div className="border-b border-stone-200 p-4">
+        <h2 className="text-h3 text-brass-gradient">{title}</h2>
         <p className="mt-1 text-paragraph-sm text-muted-foreground">
           Get answers with page citations
         </p>
@@ -175,7 +175,7 @@ export function ChatPanel({
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSubmit} className="border-t p-4">
+      <form onSubmit={handleSubmit} className="border-t border-stone-200 p-4">
         <div className="flex gap-2">
           <Input
             value={input}

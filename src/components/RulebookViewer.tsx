@@ -246,7 +246,7 @@ export function RulebookViewer({
       {/* PDF pages */}
       <div
         ref={containerRef}
-        className="flex-1 overflow-y-auto bg-muted/30 p-4"
+        className="flex-1 overflow-y-auto bg-stone-100 p-4"
       >
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-4">
           {Array.from({ length: pageCount }, (_, i) => i + 1).map((pageNum) => (
