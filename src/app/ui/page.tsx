@@ -609,10 +609,6 @@ function SearchBarSection() {
           <SearchBar />
         </ExampleGroup>
 
-        <ExampleGroup label="custom placeholder">
-          <SearchBar placeholder="Search rulebooks..." />
-        </ExampleGroup>
-
         <ExampleGroup label="full width (try typing to see dropdown)">
           <div className="w-full max-w-md">
             <SearchBar />

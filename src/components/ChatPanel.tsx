@@ -3,8 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ArrowUpIcon, ArrowLeftIcon } from "lucide-react";
+import { QuestionInput } from "@/components/QuestionInput";
+import { ArrowLeftIcon } from "lucide-react";
 import type { ApiResponse } from "@/types";
 
 type Citation = {
@@ -36,7 +36,6 @@ export function ChatPanel({
   onCitationClick,
 }: ChatPanelProps): React.ReactElement {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -68,10 +67,7 @@ export function ChatPanel({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
-    e.preventDefault();
-
-    const question = input.trim();
+  const handleSubmit = async (question: string): Promise<void> => {
     if (!question || isLoading) return;
 
     // Add user message
@@ -81,7 +77,6 @@ export function ChatPanel({
       content: question,
     };
     setMessages((prev) => [...prev, userMessage]);
-    setInput("");
     setIsLoading(true);
 
     try {
@@ -149,11 +144,7 @@ export function ChatPanel({
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4">
         {messages.length === 0 ? (
-          <div className="flex h-full items-center justify-center">
-            <p className="text-center text-paragraph-sm text-muted-foreground">
-              Ask a question about the rules
-            </p>
-          </div>
+          <div className="flex h-full items-center justify-center" />
         ) : (
           <div className="space-y-4">
             {messages.map((message) => (
@@ -175,24 +166,13 @@ export function ChatPanel({
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSubmit} className="border-t border-stone-200 p-4">
-        <div className="flex gap-2">
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask about the rules..."
-            disabled={isLoading}
-          />
-          <Button
-            type="submit"
-            disabled={isLoading || !input.trim()}
-            size="icon"
-            className="flex-shrink-0"
-          >
-            <ArrowUpIcon className="h-4 w-4" />
-          </Button>
-        </div>
-      </form>
+      <div className="border-t border-stone-200 p-4">
+        <QuestionInput
+          onSubmit={handleSubmit}
+          placeholder="Ask about the rules..."
+          disabled={isLoading}
+        />
+      </div>
     </div>
   );
 }
@@ -206,16 +186,24 @@ function MessageBubble({
 }): React.ReactElement {
   const isUser = message.role === "user";
 
+  if (isUser) {
+    return (
+      <div className="flex justify-end">
+        <div className="max-w-[85%] brass-gradient-light rounded-[16px] p-[1px]">
+          <div className="rounded-[15px] bg-white px-4 py-3">
+            <p className="whitespace-pre-wrap text-paragraph-sm text-stone-600">
+              {message.content}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
-      <div
-        className={`max-w-[85%] rounded-lg px-4 py-2 ${
-          isUser
-            ? "bg-primary text-primary-foreground"
-            : "bg-muted text-foreground"
-        }`}
-      >
-        <p className="whitespace-pre-wrap text-paragraph-sm">{message.content}</p>
+    <div className="w-full">
+      <div className="rounded-[16px] bg-white px-4 py-3">
+        <p className="whitespace-pre-wrap text-paragraph-sm text-stone-600">{message.content}</p>
 
         {/* Jump to Page links */}
         {message.citations && message.citations.length > 0 && (
