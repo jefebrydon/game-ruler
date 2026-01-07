@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { SearchBar } from "@/components/SearchBar";
 import { GameTile } from "@/components/GameTile";
 import { Header } from "@/components/Header";
@@ -52,11 +51,8 @@ export default async function HomePage(): Promise<React.ReactElement> {
       <section id="board-games" className="w-full px-6 py-16">
         <div className="mx-auto max-w-[1080px]">
           {/* Header row */}
-          <div className="mb-6 flex items-center justify-between">
+          <div className="mb-6">
             <h2 className="text-h2 text-stone-800">Board Games</h2>
-            <Button asChild variant="secondary">
-              <Link href="/upload">Upload Rulebook</Link>
-            </Button>
           </div>
 
           {/* Game Grid */}
