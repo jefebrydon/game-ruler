@@ -16,7 +16,7 @@ type ToggleProps = {
 
 export function Toggle({ options, value, onChange, className }: ToggleProps): React.ReactElement {
   return (
-    <div className={cn("brass-gradient-static inline-flex rounded-[16px] p-[3px]", className)}>
+    <div className={cn("brass-gradient-static flex rounded-[16px] p-[3px]", className)}>
       {options.map((option) => {
         const isSelected = option.value === value;
 
@@ -26,7 +26,7 @@ export function Toggle({ options, value, onChange, className }: ToggleProps): Re
             type="button"
             onClick={() => onChange(option.value)}
             className={cn(
-              "h-9 px-6 rounded-[13px] font-body text-base font-bold transition-colors",
+              "h-9 flex-1 rounded-[13px] font-body text-base font-bold transition-colors",
               isSelected
                 ? "bg-white text-brass-400"
                 : "bg-transparent text-white hover:bg-white/10"

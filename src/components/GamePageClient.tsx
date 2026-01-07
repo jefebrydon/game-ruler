@@ -43,7 +43,7 @@ export function GamePageClient({
   pdfUrl,
   pageCount,
 }: GamePageClientProps): React.ReactElement {
-  const [activeTab, setActiveTab] = useState<"rulebook" | "chat">("rulebook");
+  const [activeTab, setActiveTab] = useState<"rulebook" | "chat">("chat");
 
   const handleCitationClick = useCallback((pageNumber: number) => {
     console.log("[GamePageClient] handleCitationClick called:", pageNumber);
@@ -83,30 +83,6 @@ export function GamePageClient({
 
       {/* Mobile: Tab-based layout */}
       <div className="flex flex-1 flex-col overflow-hidden md:hidden">
-        {/* Tab buttons */}
-        <div className="flex border-b">
-          <button
-            onClick={() => setActiveTab("rulebook")}
-            className={`flex-1 px-4 py-3 text-paragraph-bold transition-colors ${
-              activeTab === "rulebook"
-                ? "border-b-2 border-primary text-primary"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Rulebook
-          </button>
-          <button
-            onClick={() => setActiveTab("chat")}
-            className={`flex-1 px-4 py-3 text-paragraph-bold transition-colors ${
-              activeTab === "chat"
-                ? "border-b-2 border-primary text-primary"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Ask Questions
-          </button>
-        </div>
-
         {/* Tab content */}
         <div className="flex-1 overflow-hidden">
           <div
@@ -125,6 +101,8 @@ export function GamePageClient({
               rulebookId={rulebookId}
               title={title}
               onCitationClick={handleCitationClick}
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
             />
           </div>
         </div>
