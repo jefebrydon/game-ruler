@@ -209,12 +209,11 @@ function MessageBubble({
             {message.citations.map((citation, idx) => (
               <Button
                 key={idx}
-                variant="link"
+                variant="secondary"
                 size="sm"
-                className="h-auto p-0 text-paragraph-sm"
                 onClick={() => onCitationClick?.(citation.pageNumber)}
               >
-                Jump to Page {citation.pageNumber}
+                See Page {citation.pageNumber}
               </Button>
             ))}
           </div>
