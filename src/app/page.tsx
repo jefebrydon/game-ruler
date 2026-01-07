@@ -53,7 +53,7 @@ export default async function HomePage(): Promise<React.ReactElement> {
         <div className="mx-auto max-w-[1080px]">
           {/* Header row */}
           <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-h2 text-brass-gradient">Board Games</h2>
+            <h2 className="text-h2 text-stone-800">Board Games</h2>
             <Button asChild variant="secondary">
               <Link href="/upload">Upload Rulebook</Link>
             </Button>

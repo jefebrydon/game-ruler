@@ -38,6 +38,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Toaster } from "@/components/ui/sonner";
 import { SearchBar } from "@/components/SearchBar";
 import { QuestionInput } from "@/components/QuestionInput";
+import { OrnamentalDivider } from "@/components/ui/ornamental-divider";
 
 function Section({
   title,
@@ -712,6 +713,20 @@ function SonnerSection() {
   );
 }
 
+function OrnamentalDividerSection() {
+  return (
+    <Section title="Ornamental Divider">
+      <div className="grid gap-6">
+        <ExampleGroup label="fill container">
+          <div className="w-full max-w-2xl">
+            <OrnamentalDivider />
+          </div>
+        </ExampleGroup>
+      </div>
+    </Section>
+  );
+}
+
 export default function UIPage() {
   return (
     <div className="min-h-screen bg-stone-50">
@@ -736,6 +751,7 @@ export default function UIPage() {
           <SearchBarSection />
           <SkeletonSection />
           <SonnerSection />
+          <OrnamentalDividerSection />
         </main>
       </div>
     </div>

@@ -135,7 +135,7 @@ export function ChatPanel({
 
       {/* Header */}
       <div className="border-b border-stone-200 p-4">
-        <h2 className="text-h3 text-brass-gradient">{title}</h2>
+        <h2 className="text-h3 text-stone-800">{title}</h2>
         <p className="mt-1 text-paragraph-sm text-muted-foreground">
           Get answers with page citations
         </p>
@@ -189,7 +189,7 @@ function MessageBubble({
   if (isUser) {
     return (
       <div className="flex justify-end">
-        <div className="max-w-[85%] brass-gradient-light rounded-[16px] p-[1px]">
+        <div className="max-w-[85%] rounded-[16px] border border-stone-200 p-[1px]">
           <div className="rounded-[15px] bg-white px-4 py-3">
             <p className="whitespace-pre-wrap text-paragraph-sm text-stone-600">
               {message.content}
@@ -202,7 +202,7 @@ function MessageBubble({
 
   return (
     <div className="w-full">
-      <div className="rounded-[16px] bg-white px-4 py-3">
+      <div>
         <p className="whitespace-pre-wrap text-paragraph-sm text-stone-600">{message.content}</p>
 
         {/* Jump to Page links */}
