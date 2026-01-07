@@ -11,7 +11,7 @@ const buttonVariants = cva(
       variant: {
         default: "brass-gradient !text-primary-foreground",
         destructive:
-          "bg-white text-[#C00D0D] border border-[#C00D0D] hover:bg-white hover:text-[#9F0A0A] hover:border-[#9F0A0A] [&_svg]:fill-current focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
+          "bg-white !text-[#C00D0D] border border-[#C00D0D] hover:bg-white hover:!text-[#9F0A0A] hover:border-[#9F0A0A] [&_svg]:fill-current focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 text-paragraph-bold",
         secondary:
           "bg-white border border-brass-300 hover:bg-beige-100 hover:text-brass-450 hover:border-brass-400 text-paragraph-bold !text-brass-400",
         ghost:
