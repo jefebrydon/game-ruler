@@ -380,26 +380,19 @@ function ToggleSection() {
     <Section title="Toggle">
       <div className="grid gap-6">
         <ExampleGroup label="default (first selected)">
-          <Toggle
-            options={[
-              { value: "selected", label: "Selected" },
-              { value: "unselected", label: "Unselected" },
-            ]}
-            value="selected"
-            onChange={() => {}}
-          />
+          <div className="w-[374px]">
+            <Toggle
+              options={[
+                { value: "selected", label: "Selected" },
+                { value: "unselected", label: "Unselected" },
+              ]}
+              value="selected"
+              onChange={() => {}}
+              className="w-full"
+            />
+          </div>
         </ExampleGroup>
 
-        <ExampleGroup label="second selected">
-          <Toggle
-            options={[
-              { value: "option-a", label: "Option A" },
-              { value: "option-b", label: "Option B" },
-            ]}
-            value="option-b"
-            onChange={() => {}}
-          />
-        </ExampleGroup>
       </div>
     </Section>
   );

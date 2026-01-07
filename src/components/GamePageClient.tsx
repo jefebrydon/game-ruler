@@ -120,7 +120,7 @@ export function GamePageClient({
         </div>
         <div className="border-b border-stone-200 p-4">
           <h2 className="text-h3 text-stone-800">{title}</h2>
-          <div className="mt-6">
+          <div className="mt-4">
             <Toggle
               options={[
                 { value: "chat", label: "Ask Questions" },

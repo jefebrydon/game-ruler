@@ -32,7 +32,7 @@ export function Header({ floating = false }: HeaderProps): React.ReactElement {
       </Link>
 
       {/* Action */}
-      <Button variant="secondary" size="sm">
+      <Button variant="secondary">
         Sign Up
       </Button>
     </header>
