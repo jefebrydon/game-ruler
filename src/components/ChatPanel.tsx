@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { QuestionInput } from "@/components/QuestionInput";
 import { OrnamentalDivider } from "@/components/ui/ornamental-divider";
-import { ArrowLeftIcon } from "lucide-react";
+import { ArrowLeftIcon, ArrowDownIcon } from "lucide-react";
 import type { ApiResponse } from "@/types";
 
 type Citation = {
@@ -145,7 +145,21 @@ export function ChatPanel({
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4">
         {messages.length === 0 ? (
-          <div className="flex h-full items-center justify-center" />
+          <div className="flex h-full items-center justify-center">
+            <div className="flex flex-col items-center gap-4">
+              <img
+                src="/Compass-Brass.png"
+                alt="Compass"
+                className="h-20 w-auto"
+              />
+              <p className="text-center text-paragraph text-stone-600">
+                Get answers, see the
+                <br />
+                sources in the rulebook.
+              </p>
+              <ArrowDownIcon className="h-5 w-5 text-stone-600" strokeWidth={1.5} />
+            </div>
+          </div>
         ) : (
           <div className="space-y-4">
             {messages.map((message) => (
