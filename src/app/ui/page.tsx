@@ -91,6 +91,9 @@ function TextStylesSection() {
         <ExampleGroup label="text-paragraph">
           <p className="text-paragraph">Regular Paragraph Text</p>
         </ExampleGroup>
+        <ExampleGroup label="text-paragraph-sm-bold">
+          <p className="text-paragraph-sm-bold">Small Bold Paragraph Text</p>
+        </ExampleGroup>
         <ExampleGroup label="text-paragraph-sm">
           <p className="text-paragraph-sm">Small Paragraph Text</p>
         </ExampleGroup>
