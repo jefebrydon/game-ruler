@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { QuestionInput } from "@/components/QuestionInput";
 import { OrnamentalDivider } from "@/components/ui/ornamental-divider";
-import { Toggle } from "@/components/ui/toggle";
 import { ArrowLeftIcon } from "lucide-react";
 import type { ApiResponse } from "@/types";
 
@@ -30,18 +29,15 @@ type ChatPanelProps = {
   rulebookId: string;
   title: string;
   onCitationClick?: (pageNumber: number) => void;
-  /** Mobile-only: current tab value */
-  activeTab?: "chat" | "rulebook";
-  /** Mobile-only: callback when tab changes */
-  onTabChange?: (tab: "chat" | "rulebook") => void;
+  /** Hide the back button and header on mobile (when shown in GamePageClient) */
+  hideMobileHeader?: boolean;
 };
 
 export function ChatPanel({
   rulebookId,
   title,
   onCitationClick,
-  activeTab,
-  onTabChange,
+  hideMobileHeader,
 }: ChatPanelProps): React.ReactElement {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -128,8 +124,8 @@ export function ChatPanel({
 
   return (
     <div className="flex h-full flex-col">
-      {/* Back to Games */}
-      <div className="border-b border-stone-200 px-4 py-3">
+      {/* Back to Games - hidden on mobile when header is in parent */}
+      <div className={`border-b border-stone-200 px-4 py-3 ${hideMobileHeader ? "hidden md:block" : ""}`}>
         <Button
           variant="ghost"
           size="sm"
@@ -141,23 +137,9 @@ export function ChatPanel({
         </Button>
       </div>
 
-      {/* Header */}
-      <div className="border-b border-stone-200 p-4">
+      {/* Header - hidden on mobile when header is in parent */}
+      <div className={`border-b border-stone-200 p-4 ${hideMobileHeader ? "hidden md:block" : ""}`}>
         <h2 className="text-h3 text-stone-800">{title}</h2>
-        {/* Mobile-only Toggle */}
-        {activeTab && onTabChange && (
-          <div className="mt-6 md:hidden">
-            <Toggle
-              options={[
-                { value: "chat", label: "Ask Questions" },
-                { value: "rulebook", label: "See Rulebook" },
-              ]}
-              value={activeTab}
-              onChange={(v) => onTabChange(v as "chat" | "rulebook")}
-              className="w-full"
-            />
-          </div>
-        )}
       </div>
 
       {/* Messages */}
