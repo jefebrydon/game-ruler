@@ -150,7 +150,7 @@ export function ChatPanel({
               <img
                 src="/Compass-Brass.png"
                 alt="Compass"
-                className="h-20 w-auto"
+                className="h-20 w-auto animate-spin-once"
               />
               <p className="text-center text-paragraph text-stone-600">
                 Get answers, see the
