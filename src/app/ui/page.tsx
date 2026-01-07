@@ -38,6 +38,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { SearchBar } from "@/components/SearchBar";
 import { QuestionInput } from "@/components/QuestionInput";
 import { OrnamentalDivider } from "@/components/ui/ornamental-divider";
+import { Toggle } from "@/components/ui/toggle";
 
 function Section({
   title,
@@ -374,6 +375,36 @@ function ButtonSection() {
   );
 }
 
+function ToggleSection() {
+  return (
+    <Section title="Toggle">
+      <div className="grid gap-6">
+        <ExampleGroup label="default (first selected)">
+          <Toggle
+            options={[
+              { value: "selected", label: "Selected" },
+              { value: "unselected", label: "Unselected" },
+            ]}
+            value="selected"
+            onChange={() => {}}
+          />
+        </ExampleGroup>
+
+        <ExampleGroup label="second selected">
+          <Toggle
+            options={[
+              { value: "option-a", label: "Option A" },
+              { value: "option-b", label: "Option B" },
+            ]}
+            value="option-b"
+            onChange={() => {}}
+          />
+        </ExampleGroup>
+      </div>
+    </Section>
+  );
+}
+
 function CardSection() {
   return (
     <Section title="Card">
@@ -675,6 +706,7 @@ export default function UIPage() {
           <TextStylesSection />
           <ColorsSection />
           <ButtonSection />
+          <ToggleSection />
           <CardSection />
           <CommandSection />
           <DialogSection />

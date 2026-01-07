@@ -196,6 +196,9 @@
   .brass-gradient:hover:not(:disabled) {
     background: linear-gradient(to right, #917549, #61441A);
   }
+  .brass-gradient-static {
+    background: linear-gradient(to right, #A08151, #715936);
+  }
   .brass-gradient-hover {
     background: linear-gradient(to right, #917549, #61441A);
   }
