@@ -91,6 +91,7 @@ export function GamePageClient({
             rulebookId={rulebookId}
             title={title}
             onCitationClick={handleCitationClick}
+            autoScrollOnResponse
           />
         </div>
 

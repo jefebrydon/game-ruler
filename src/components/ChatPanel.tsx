@@ -31,6 +31,8 @@ type ChatPanelProps = {
   onCitationClick?: (pageNumber: number) => void;
   /** Hide the back button and header on mobile (when shown in GamePageClient) */
   hideMobileHeader?: boolean;
+  /** Auto-scroll to first citation when response is received (desktop only) */
+  autoScrollOnResponse?: boolean;
 };
 
 export function ChatPanel({
@@ -38,6 +40,7 @@ export function ChatPanel({
   title,
   onCitationClick,
   hideMobileHeader,
+  autoScrollOnResponse,
 }: ChatPanelProps): React.ReactElement {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -105,8 +108,8 @@ export function ChatPanel({
       };
       setMessages((prev) => [...prev, assistantMessage]);
 
-      // Auto-scroll to first cited page
-      if (json.data.citations.length > 0 && onCitationClick) {
+      // Auto-scroll to first cited page (desktop only)
+      if (autoScrollOnResponse && json.data.citations.length > 0 && onCitationClick) {
         onCitationClick(json.data.citations[0].pageNumber);
       }
     } catch (err) {
