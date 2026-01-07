@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { QuestionInput } from "@/components/QuestionInput";
+import { OrnamentalDivider } from "@/components/ui/ornamental-divider";
 import { ArrowLeftIcon } from "lucide-react";
 import type { ApiResponse } from "@/types";
 
@@ -121,7 +122,7 @@ export function ChatPanel({
   return (
     <div className="flex h-full flex-col">
       {/* Back to Games */}
-      <div className="border-b border-stone-200 p-4">
+      <div className="border-b border-stone-200 px-4 py-3">
         <Button
           variant="ghost"
           size="sm"
@@ -136,9 +137,6 @@ export function ChatPanel({
       {/* Header */}
       <div className="border-b border-stone-200 p-4">
         <h2 className="text-h3 text-stone-800">{title}</h2>
-        <p className="mt-1 text-paragraph-sm text-muted-foreground">
-          Get answers with page citations
-        </p>
       </div>
 
       {/* Messages */}
@@ -221,6 +219,11 @@ function MessageBubble({
             ))}
           </div>
         )}
+
+        {/* Ornamental Divider */}
+        <div className="mt-4">
+          <OrnamentalDivider />
+        </div>
       </div>
     </div>
   );

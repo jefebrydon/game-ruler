@@ -35,7 +35,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Toaster } from "@/components/ui/sonner";
 import { SearchBar } from "@/components/SearchBar";
 import { QuestionInput } from "@/components/QuestionInput";
 import { OrnamentalDivider } from "@/components/ui/ornamental-divider";
@@ -644,75 +643,6 @@ function QuestionInputSection() {
   );
 }
 
-function SonnerSection() {
-  return (
-    <Section title="Sonner (Toast)">
-      <div className="flex flex-wrap gap-4">
-        <ExampleGroup label="success">
-          <Button
-            variant="secondary"
-            onClick={() => toast.success("Success! Operation completed.")}
-          >
-            Show Success
-          </Button>
-        </ExampleGroup>
-
-        <ExampleGroup label="error">
-          <Button
-            variant="secondary"
-            onClick={() => toast.error("Error! Something went wrong.")}
-          >
-            Show Error
-          </Button>
-        </ExampleGroup>
-
-        <ExampleGroup label="info">
-          <Button
-            variant="secondary"
-            onClick={() => toast.info("Info: Here's some information.")}
-          >
-            Show Info
-          </Button>
-        </ExampleGroup>
-
-        <ExampleGroup label="warning">
-          <Button
-            variant="secondary"
-            onClick={() => toast.warning("Warning: Be careful!")}
-          >
-            Show Warning
-          </Button>
-        </ExampleGroup>
-
-        <ExampleGroup label="loading">
-          <Button
-            variant="secondary"
-            onClick={() => {
-              const id = toast.loading("Loading...");
-              setTimeout(() => toast.dismiss(id), 2000);
-            }}
-          >
-            Show Loading
-          </Button>
-        </ExampleGroup>
-
-        <ExampleGroup label="with description">
-          <Button
-            variant="secondary"
-            onClick={() =>
-              toast("Event Created", {
-                description: "Your event has been scheduled for tomorrow.",
-              })
-            }
-          >
-            With Description
-          </Button>
-        </ExampleGroup>
-      </div>
-    </Section>
-  );
-}
-
 function OrnamentalDividerSection() {
   return (
     <Section title="Ornamental Divider">
@@ -730,7 +660,6 @@ function OrnamentalDividerSection() {
 export default function UIPage() {
   return (
     <div className="min-h-screen bg-stone-50">
-      <Toaster />
       <div className="mx-auto max-w-5xl px-6 py-12">
         <header className="mb-12">
           <h1 className="text-4xl font-bold">UI Components</h1>
@@ -750,7 +679,6 @@ export default function UIPage() {
           <QuestionInputSection />
           <SearchBarSection />
           <SkeletonSection />
-          <SonnerSection />
           <OrnamentalDividerSection />
         </main>
       </div>
