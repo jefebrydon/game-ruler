@@ -336,10 +336,10 @@ export function UploadForm(): React.ReactElement {
 
       {/* File Input */}
       <div className="space-y-2">
-        <label htmlFor="file" className="text-paragraph-bold">
+        <label className="text-paragraph-bold">
           PDF Rulebook <span className="text-destructive">*</span>
         </label>
-        <Input
+        <input
           id="file"
           ref={fileInputRef}
           type="file"
@@ -347,13 +347,24 @@ export function UploadForm(): React.ReactElement {
           onChange={handleFileChange}
           disabled={isProcessing}
           required
+          className="sr-only"
         />
-        <p className="text-paragraph-sm text-muted-foreground">PDF only, max 50MB</p>
-        {file && (
-          <p className="text-paragraph-sm text-muted-foreground">
-            Selected: {file.name} ({(file.size / 1024 / 1024).toFixed(1)}MB)
-          </p>
-        )}
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isProcessing}
+          className="flex h-9 w-full items-center rounded-md border border-input bg-transparent px-3 py-1 text-paragraph shadow-xs transition-[color,box-shadow] outline-none hover:bg-muted/50 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <span className={file ? "text-foreground" : "text-muted-foreground"}>
+            {file ? file.name : "Add a PDF"}
+          </span>
+        </button>
+        <p className="text-paragraph-sm text-muted-foreground">
+          {file 
+            ? `${(file.size / 1024 / 1024).toFixed(1)}MB — Max 50MB`
+            : "Max 50MB"
+          }
+        </p>
       </div>
 
       {/* Thumbnail Input */}
