@@ -59,33 +59,36 @@ export async function POST(
       // Continue anyway - we'll still delete what we can
     }
 
-    // Delete OpenAI files in parallel (ignore errors - files may already be deleted)
-    if (pages?.length) {
-      const fileDeletePromises = pages.map(async (page) => {
-        try {
-          await openai.files.del(page.openai_file_id);
-        } catch (err) {
-          // Log but don't fail - file may already be deleted
-          console.warn(`Failed to delete OpenAI file ${page.openai_file_id}:`, err);
-        }
-      });
-      await Promise.all(fileDeletePromises);
+    // Delete OpenAI vector stores FIRST (releases attached files)
+    const vectorStoreIds = rulebooks
+      .filter((r) => r.openai_vector_store_id)
+      .map((r) => r.openai_vector_store_id!);
+    
+    console.log(`[DELETE] Deleting ${vectorStoreIds.length} vector stores:`, vectorStoreIds);
+    
+    for (const vectorStoreId of vectorStoreIds) {
+      try {
+        console.log(`[DELETE] Attempting to delete vector store: ${vectorStoreId}`);
+        const result = await openai.vectorStores.del(vectorStoreId);
+        console.log(`[DELETE] Vector store deleted:`, result);
+      } catch (err) {
+        console.error(`[DELETE] Failed to delete vector store ${vectorStoreId}:`, err);
+      }
     }
 
-    // Delete OpenAI vector stores (ignore errors)
-    const vectorStoreDeletePromises = rulebooks
-      .filter((r) => r.openai_vector_store_id)
-      .map(async (rulebook) => {
-        try {
-          await openai.vectorStores.del(rulebook.openai_vector_store_id!);
-        } catch (err) {
-          console.warn(
-            `Failed to delete OpenAI vector store ${rulebook.openai_vector_store_id}:`,
-            err
-          );
-        }
-      });
-    await Promise.all(vectorStoreDeletePromises);
+    // Delete OpenAI files SECOND (now released from vector stores)
+    const fileIds = pages?.map((p) => p.openai_file_id) ?? [];
+    console.log(`[DELETE] Deleting ${fileIds.length} files:`, fileIds);
+    
+    for (const fileId of fileIds) {
+      try {
+        console.log(`[DELETE] Attempting to delete file: ${fileId}`);
+        const result = await openai.files.del(fileId);
+        console.log(`[DELETE] File deleted:`, result);
+      } catch (err) {
+        console.error(`[DELETE] Failed to delete file ${fileId}:`, err);
+      }
+    }
 
     // Delete storage files (PDFs and thumbnails)
     const pdfPaths = rulebooks.map((r) => `pdfs/${r.id}.pdf`);
