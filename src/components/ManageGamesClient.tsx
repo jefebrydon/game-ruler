@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeftIcon } from "lucide-react";
+import { toast } from "sonner";
 import type { RulebookStatus } from "@/types/database";
 
 const STORAGE_KEY = "manage-unlocked";
@@ -33,6 +34,8 @@ export function ManageGamesClient({
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
 
   // Check sessionStorage on mount
@@ -73,6 +76,7 @@ export function ManageGamesClient({
   };
 
   const handleSelectAll = (checked: boolean): void => {
+    setConfirmingDelete(false);
     if (checked) {
       setSelectedIds(new Set(rulebooks.map((r) => r.id)));
     } else {
@@ -81,6 +85,7 @@ export function ManageGamesClient({
   };
 
   const handleSelectOne = (id: string, checked: boolean): void => {
+    setConfirmingDelete(false);
     const newSet = new Set(selectedIds);
     if (checked) {
       newSet.add(id);
@@ -88,6 +93,46 @@ export function ManageGamesClient({
       newSet.delete(id);
     }
     setSelectedIds(newSet);
+  };
+
+  const handleDeleteClick = (): void => {
+    if (confirmingDelete) {
+      // Second click - perform deletion
+      handleDelete();
+    } else {
+      // First click - show confirmation
+      setConfirmingDelete(true);
+    }
+  };
+
+  const handleDelete = async (): Promise<void> => {
+    if (selectedIds.size === 0) return;
+
+    setIsDeleting(true);
+    try {
+      const response = await fetch("/api/rulebooks/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: Array.from(selectedIds) }),
+      });
+
+      const result = await response.json();
+
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+
+      toast.success(`Deleted ${result.data.deletedCount} rulebook(s)`);
+      setSelectedIds(new Set());
+      setConfirmingDelete(false);
+      router.refresh();
+    } catch (err) {
+      console.error("Delete failed:", err);
+      toast.error("Failed to delete rulebooks");
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const formatDate = (dateString: string): string => {
@@ -171,8 +216,16 @@ export function ManageGamesClient({
           <Link href="/upload">Upload Rulebook</Link>
         </Button>
         <Button variant="secondary">Bulk Upload</Button>
-        <Button variant="destructive" disabled={selectedIds.size === 0}>
-          Delete
+        <Button
+          variant="destructive"
+          disabled={selectedIds.size === 0 || isDeleting}
+          onClick={handleDeleteClick}
+        >
+          {isDeleting
+            ? "Deleting..."
+            : confirmingDelete
+              ? `Confirm Deletion (${selectedIds.size})`
+              : `Delete${selectedIds.size > 0 ? ` (${selectedIds.size})` : ""}`}
         </Button>
       </div>
 
