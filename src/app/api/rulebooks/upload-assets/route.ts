@@ -7,6 +7,13 @@ type UploadAssetsResponse = {
   pdfUrl: string;
 };
 
+const MIME_TO_EXT: Record<string, string> = {
+  "image/png": "png",
+  "image/jpeg": "jpg",
+  "image/webp": "webp",
+  "image/gif": "gif",
+};
+
 export async function POST(
   request: NextRequest
 ): Promise<NextResponse<ApiResponse<UploadAssetsResponse>>> {
@@ -24,14 +31,18 @@ export async function POST(
 
     const supabase = createServerClient();
 
+    // Determine file extension from MIME type
+    const ext = MIME_TO_EXT[thumbnail.type] ?? "png";
+    const contentType = thumbnail.type || "image/png";
+
     // Upload thumbnail
-    const thumbnailPath = `thumbnails/${rulebookId}.png`;
+    const thumbnailPath = `thumbnails/${rulebookId}.${ext}`;
     const thumbnailBuffer = await thumbnail.arrayBuffer();
     
     const { error: thumbnailError } = await supabase.storage
       .from("rulebooks")
       .upload(thumbnailPath, thumbnailBuffer, {
-        contentType: "image/png",
+        contentType,
         upsert: true,
       });
 

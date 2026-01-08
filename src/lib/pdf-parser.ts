@@ -1,10 +1,6 @@
 "use client";
 
-import * as pdfjsLib from "pdfjs-dist";
 import { PDFDocument } from "pdf-lib";
-
-// Set worker source - unpkg mirrors npm directly, ensuring version match
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
 
 export type SinglePagePDF = {
   pageNumber: number; // 1-based index
@@ -15,11 +11,10 @@ export type SinglePagePDF = {
 export type ParsedPDF = {
   pageCount: number;
   singlePages: SinglePagePDF[];
-  thumbnailBlob: Blob;
 };
 
 /**
- * Parse a PDF file: split into single-page PDFs and generate a thumbnail.
+ * Parse a PDF file: split into single-page PDFs.
  */
 export async function parsePDF(file: File): Promise<ParsedPDF> {
   const arrayBuffer = await file.arrayBuffer();
@@ -27,15 +22,9 @@ export async function parsePDF(file: File): Promise<ParsedPDF> {
   // Split PDF into single pages using pdf-lib
   const singlePages = await splitPDFIntoPages(arrayBuffer);
 
-  // Generate thumbnail from first page using pdfjs (for rendering)
-  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-  const firstPage = await pdf.getPage(1);
-  const thumbnailBlob = await renderPageToBlob(firstPage, 0.5);
-
   return {
     pageCount: singlePages.length,
     singlePages,
-    thumbnailBlob,
   };
 }
 
@@ -87,44 +76,5 @@ async function blobToBase64(blob: Blob): Promise<string> {
     };
     reader.onerror = reject;
     reader.readAsDataURL(blob);
-  });
-}
-
-/**
- * Render a PDF page to a PNG blob.
- */
-async function renderPageToBlob(
-  page: pdfjsLib.PDFPageProxy,
-  scale: number
-): Promise<Blob> {
-  const viewport = page.getViewport({ scale });
-
-  const canvas = document.createElement("canvas");
-  canvas.width = viewport.width;
-  canvas.height = viewport.height;
-
-  const context = canvas.getContext("2d");
-  if (!context) {
-    throw new Error("Failed to get canvas context");
-  }
-
-  await page.render({
-    canvasContext: context,
-    viewport,
-    canvas,
-  }).promise;
-
-  return new Promise((resolve, reject) => {
-    canvas.toBlob(
-      (blob) => {
-        if (blob) {
-          resolve(blob);
-        } else {
-          reject(new Error("Failed to create blob from canvas"));
-        }
-      },
-      "image/png",
-      0.9
-    );
   });
 }

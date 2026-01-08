@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import type { ApiResponse } from "@/types";
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+const MAX_THUMBNAIL_SIZE = 5 * 1024 * 1024; // 5MB
+const ACCEPTED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"];
 const BATCH_SIZE = 25; // Pages per batch for OpenAI ingestion
 const GEMINI_CONCURRENCY = 5; // Parallel Gemini requests
 
@@ -23,10 +25,14 @@ type UploadState =
 export function UploadForm(): React.ReactElement {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const thumbnailInputRef = useRef<HTMLInputElement>(null);
 
   const [title, setTitle] = useState("");
   const [year, setYear] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
+  const [isDraggingThumbnail, setIsDraggingThumbnail] = useState(false);
   const [state, setState] = useState<UploadState>({ step: "form" });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -50,6 +56,76 @@ export function UploadForm(): React.ReactElement {
     setFile(selectedFile);
   };
 
+  const validateThumbnail = (file: File): boolean => {
+    if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+      toast.error("Please select a valid image (PNG, JPEG, WebP, or GIF)");
+      return false;
+    }
+    if (file.size > MAX_THUMBNAIL_SIZE) {
+      toast.error("Thumbnail must be under 5MB");
+      return false;
+    }
+    return true;
+  };
+
+  const setThumbnailWithPreview = (file: File): void => {
+    setThumbnailFile(file);
+    const objectUrl = URL.createObjectURL(file);
+    setThumbnailPreview(objectUrl);
+  };
+
+  const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile) return;
+
+    if (!validateThumbnail(selectedFile)) {
+      e.target.value = "";
+      return;
+    }
+
+    setThumbnailWithPreview(selectedFile);
+  };
+
+  const handleThumbnailDragOver = (e: React.DragEvent<HTMLDivElement>): void => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingThumbnail(true);
+  };
+
+  const handleThumbnailDragLeave = (e: React.DragEvent<HTMLDivElement>): void => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingThumbnail(false);
+  };
+
+  const handleThumbnailDrop = (e: React.DragEvent<HTMLDivElement>): void => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingThumbnail(false);
+
+    const droppedFile = e.dataTransfer.files[0];
+    if (!droppedFile) return;
+
+    if (!validateThumbnail(droppedFile)) return;
+
+    setThumbnailWithPreview(droppedFile);
+  };
+
+  const handleThumbnailClick = (): void => {
+    thumbnailInputRef.current?.click();
+  };
+
+  const clearThumbnail = (): void => {
+    setThumbnailFile(null);
+    if (thumbnailPreview) {
+      URL.revokeObjectURL(thumbnailPreview);
+      setThumbnailPreview(null);
+    }
+    if (thumbnailInputRef.current) {
+      thumbnailInputRef.current.value = "";
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
 
@@ -60,6 +136,11 @@ export function UploadForm(): React.ReactElement {
 
     if (!file) {
       toast.error("Please select a PDF file");
+      return;
+    }
+
+    if (!thumbnailFile) {
+      toast.error("Please select a thumbnail image");
       return;
     }
 
@@ -106,7 +187,7 @@ export function UploadForm(): React.ReactElement {
 
       // Dynamic import to avoid SSR issues
       const { parsePDF } = await import("@/lib/pdf-parser");
-      const { pageCount, singlePages, thumbnailBlob } = await parsePDF(file);
+      const { pageCount, singlePages } = await parsePDF(file);
 
       // Step 4: Process each page through Gemini
       const processedPages: { pageNumber: number; text: string }[] = [];
@@ -198,7 +279,7 @@ export function UploadForm(): React.ReactElement {
       // Step 6: Upload thumbnail
       setState({ step: "finalizing", message: "Uploading thumbnail..." });
 
-      await uploadThumbnail(rulebookId, thumbnailBlob);
+      await uploadThumbnail(rulebookId, thumbnailFile);
 
       // Step 7: Navigate to game page
       toast.success("Rulebook uploaded successfully!");
@@ -266,6 +347,91 @@ export function UploadForm(): React.ReactElement {
         {file && (
           <p className="text-paragraph-sm text-muted-foreground">
             Selected: {file.name} ({(file.size / 1024 / 1024).toFixed(1)}MB)
+          </p>
+        )}
+      </div>
+
+      {/* Thumbnail Input */}
+      <div className="space-y-2">
+        <label htmlFor="thumbnail" className="text-paragraph-bold">
+          Thumbnail <span className="text-destructive">*</span>
+        </label>
+        <input
+          id="thumbnail"
+          ref={thumbnailInputRef}
+          type="file"
+          accept="image/png,image/jpeg,image/webp,image/gif"
+          onChange={handleThumbnailChange}
+          disabled={isProcessing}
+          className="sr-only"
+        />
+        <div
+          onClick={!isProcessing ? handleThumbnailClick : undefined}
+          onDragOver={!isProcessing ? handleThumbnailDragOver : undefined}
+          onDragLeave={!isProcessing ? handleThumbnailDragLeave : undefined}
+          onDrop={!isProcessing ? handleThumbnailDrop : undefined}
+          className={`
+            relative flex min-h-[120px] cursor-pointer flex-col items-center justify-center
+            rounded-lg border-2 border-dashed transition-colors
+            ${isDraggingThumbnail 
+              ? "border-primary bg-primary/5" 
+              : "border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/50"
+            }
+            ${isProcessing ? "pointer-events-none opacity-50" : ""}
+          `}
+        >
+          {thumbnailPreview ? (
+            <div className="relative p-4">
+              <img
+                src={thumbnailPreview}
+                alt="Thumbnail preview"
+                className="max-h-[200px] max-w-full rounded object-contain"
+              />
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  clearThumbnail();
+                }}
+                disabled={isProcessing}
+                className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/80"
+                aria-label="Remove thumbnail"
+              >
+                ×
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-2 p-4 text-center">
+              <svg
+                className="h-8 w-8 text-muted-foreground"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+              <div>
+                <span className="text-paragraph-sm font-medium text-primary">
+                  Click to upload
+                </span>
+                <span className="text-paragraph-sm text-muted-foreground">
+                  {" "}or drag and drop
+                </span>
+              </div>
+              <p className="text-paragraph-sm text-muted-foreground">
+                PNG, JPEG, WebP, or GIF (max 5MB)
+              </p>
+            </div>
+          )}
+        </div>
+        {thumbnailFile && (
+          <p className="text-paragraph-sm text-muted-foreground">
+            Selected: {thumbnailFile.name} ({(thumbnailFile.size / 1024 / 1024).toFixed(2)}MB)
           </p>
         )}
       </div>
@@ -360,11 +526,11 @@ function ProgressDisplay({ state }: { state: UploadState }): React.ReactElement 
  */
 async function uploadThumbnail(
   rulebookId: string,
-  thumbnailBlob: Blob
+  thumbnailFile: File
 ): Promise<void> {
   const formData = new FormData();
   formData.append("rulebookId", rulebookId);
-  formData.append("thumbnail", thumbnailBlob, "thumbnail.png");
+  formData.append("thumbnail", thumbnailFile, thumbnailFile.name);
 
   const res = await fetch("/api/rulebooks/upload-assets", {
     method: "POST",
