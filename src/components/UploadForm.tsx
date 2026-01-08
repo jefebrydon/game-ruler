@@ -134,6 +134,11 @@ export function UploadForm(): React.ReactElement {
       return;
     }
 
+    if (!year.trim()) {
+      toast.error("Please enter a publication year");
+      return;
+    }
+
     if (!file) {
       toast.error("Please select a PDF file");
       return;
@@ -314,8 +319,7 @@ export function UploadForm(): React.ReactElement {
       {/* Year */}
       <div className="space-y-2">
         <label htmlFor="year" className="text-paragraph-bold">
-          Publication Year{" "}
-          <span className="text-paragraph text-muted-foreground">(optional)</span>
+          Publication Year <span className="text-destructive">*</span>
         </label>
         <Input
           id="year"
@@ -326,6 +330,7 @@ export function UploadForm(): React.ReactElement {
           min={1900}
           max={new Date().getFullYear() + 1}
           disabled={isProcessing}
+          required
         />
       </div>
 

@@ -215,7 +215,6 @@ export function ManageGamesClient({
         <Button variant="secondary" asChild>
           <Link href="/upload">Upload Rulebook</Link>
         </Button>
-        <Button variant="secondary">Bulk Upload</Button>
         <Button
           variant="destructive"
           disabled={selectedIds.size === 0 || isDeleting}
