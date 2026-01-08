@@ -7,7 +7,7 @@ export default async function ManagePage(): Promise<React.ReactElement> {
 
   const { data: rulebooks, error } = await supabase
     .from("rulebooks")
-    .select("id, slug, title, status, page_count, created_at")
+    .select("id, slug, title, year, status, page_count, created_at")
     .order("created_at", { ascending: false });
 
   if (error) {

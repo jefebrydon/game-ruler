@@ -15,6 +15,7 @@ type RulebookRow = {
   id: string;
   slug: string;
   title: string;
+  year: number | null;
   status: RulebookStatus;
   page_count: number;
   created_at: string;
@@ -195,6 +196,9 @@ export function ManageGamesClient({
                 Title
               </th>
               <th className="px-4 py-3 text-left text-paragraph-sm-bold text-stone-600">
+                Year
+              </th>
+              <th className="px-4 py-3 text-left text-paragraph-sm-bold text-stone-600">
                 Status
               </th>
               <th className="px-4 py-3 text-left text-paragraph-sm-bold text-stone-600">
@@ -212,7 +216,7 @@ export function ManageGamesClient({
             {rulebooks.length === 0 ? (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={7}
                   className="px-4 py-8 text-center text-paragraph text-muted-foreground"
                 >
                   No rulebooks found.
@@ -233,6 +237,9 @@ export function ManageGamesClient({
                   </td>
                   <td className="px-4 py-3 text-paragraph-sm text-stone-800">
                     {rulebook.title}
+                  </td>
+                  <td className="px-4 py-3 text-paragraph-sm text-stone-600">
+                    {rulebook.year ?? "—"}
                   </td>
                   <td className="px-4 py-3">
                     {getStatusBadge(rulebook.status)}
