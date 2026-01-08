@@ -69,7 +69,7 @@ export async function POST(
     for (const vectorStoreId of vectorStoreIds) {
       try {
         console.log(`[DELETE] Attempting to delete vector store: ${vectorStoreId}`);
-        const result = await openai.vectorStores.del(vectorStoreId);
+        const result = await openai.vectorStores.delete(vectorStoreId);
         console.log(`[DELETE] Vector store deleted:`, result);
       } catch (err) {
         console.error(`[DELETE] Failed to delete vector store ${vectorStoreId}:`, err);
@@ -83,7 +83,7 @@ export async function POST(
     for (const fileId of fileIds) {
       try {
         console.log(`[DELETE] Attempting to delete file: ${fileId}`);
-        const result = await openai.files.del(fileId);
+        const result = await openai.files.delete(fileId);
         console.log(`[DELETE] File deleted:`, result);
       } catch (err) {
         console.error(`[DELETE] Failed to delete file ${fileId}:`, err);
