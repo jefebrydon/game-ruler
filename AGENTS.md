@@ -13,6 +13,7 @@ Guide for AI agents and developers making code changes to this project.
 | **Auto-scroll to citations** | Clicking citation jumps to that page in viewer | `GamePageClient.tsx`, `RulebookViewer.tsx` (scrollToPage) |
 | **Search games** | Debounced autocomplete search | `GameSearch.tsx`, `search/route.ts` |
 | **Browse library** | Grid of all uploaded rulebooks | `games/page.tsx`, `GameCard.tsx` |
+| **Delete rulebooks** | Batch delete with full resource cleanup | `ManageGamesClient.tsx`, `delete/route.ts` |
 | **Responsive layout** | Desktop: side-by-side / Mobile: tabs | `GamePageClient.tsx` |
 
 ## Repo Map
@@ -23,15 +24,18 @@ src/
 │   ├── api/rulebooks/        # API routes
 │   │   ├── ask/              # Q&A endpoint (OpenAI query + citations)
 │   │   ├── create-upload/    # Creates DB row + signed upload URL
+│   │   ├── delete/           # Batch delete with resource cleanup
 │   │   ├── ingest-batch/     # Uploads pages to OpenAI vector store
 │   │   ├── process-page/     # Gemini PDF processing
 │   │   ├── search/           # Search rulebooks by title
 │   │   └── upload-assets/    # Thumbnail upload
 │   ├── games/[slug]/         # Rulebook viewer + chat page
+│   ├── manage/               # Admin page: list + delete rulebooks
 │   └── upload/               # Upload form page
 ├── components/               # React components
 │   ├── ui/                   # Shadcn/ui primitives
 │   ├── ChatPanel.tsx         # Q&A chat interface
+│   ├── ManageGamesClient.tsx # Admin: list, select, delete rulebooks
 │   ├── RulebookViewer.tsx    # PDF viewer (pdf.js)
 │   ├── UploadForm.tsx        # Upload flow orchestrator
 │   └── GameSearch.tsx        # Search autocomplete
@@ -148,6 +152,37 @@ supabase/migrations/          # Database schema SQL
 - `src/app/api/rulebooks/ask/route.ts` — query + citation resolution
 - `src/components/RulebookViewer.tsx` — PDF display + scroll-to-page
 
+### Delete Flow
+
+**Trigger:** Select rulebooks + click Delete in `ManageGamesClient.tsx`
+
+**UI pattern:** Two-click confirmation (first click shows "Confirm Deletion", second click executes)
+
+**Steps (order is critical):**
+1. Fetch rulebooks and their `openai_vector_store_id` values
+2. Fetch all `rulebook_pages` to get `openai_file_id` values
+3. Delete OpenAI vector stores FIRST (releases attached files)
+4. Delete OpenAI files SECOND (now released from vector stores)
+5. Delete Supabase Storage files (PDFs and thumbnails)
+6. Delete database row (cascade deletes `rulebook_pages`)
+
+**Ordering invariant:**
+- Vector stores MUST be deleted before files — OpenAI files attached to a vector store cannot be deleted while still attached
+
+**Resources cleaned up:**
+- OpenAI: vector store + all page files
+- Supabase Storage: `pdfs/<rulebookId>.pdf`, `thumbnails/<rulebookId>.png`
+- Database: `rulebooks` row (cascades to `rulebook_pages`)
+
+**Failure handling:**
+- Individual OpenAI resource deletion failures are logged but don't abort the operation
+- Storage file deletion errors are ignored (files may not exist)
+- Only hard fails on Supabase DB errors
+
+**Key files:**
+- `src/components/ManageGamesClient.tsx` — UI with multi-select and confirmation
+- `src/app/api/rulebooks/delete/route.ts` — batch delete endpoint
+
 ### Integration Reference
 
 | Integration | Purpose | Called From |
@@ -155,8 +190,8 @@ supabase/migrations/          # Database schema SQL
 | Supabase DB | All CRUD operations | `lib/supabase/server.ts` via route handlers |
 | Supabase Storage | PDF + thumbnail storage | `create-upload/`, `upload-assets/`, client direct |
 | Gemini | PDF page → structured text | `process-page/route.ts` |
-| OpenAI Files | Upload .txt files | `ingest-batch/route.ts` |
-| OpenAI Vector Stores | Create store + attach files | `ingest-batch/route.ts` |
+| OpenAI Files | Upload .txt files, delete on rulebook removal | `ingest-batch/route.ts`, `delete/route.ts` |
+| OpenAI Vector Stores | Create store + attach files, delete on rulebook removal | `ingest-batch/route.ts`, `delete/route.ts` |
 | OpenAI Responses | Q&A with file_search | `ask/route.ts` |
 
 All integrations are synchronous (await). No background jobs or queues.
@@ -228,6 +263,7 @@ npm run build     # Type check + production build
 3. Ask a question about the rulebook
 4. Verify answer includes citation buttons
 5. Click citation — PDF should scroll to correct page
+6. Delete rulebook via `/manage` — verify removed from library and OpenAI dashboard
 
 ## Environment Variables
 
