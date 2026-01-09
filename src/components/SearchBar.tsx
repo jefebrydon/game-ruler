@@ -122,7 +122,7 @@ export function SearchBar({
                 <button
                   key={game.id}
                   onClick={() => handleSelect(game.slug)}
-                  className="flex w-full cursor-pointer flex-col px-4 py-2 text-left hover:bg-accent"
+                  className="flex w-full cursor-pointer items-center justify-between px-4 py-2 text-left hover:bg-accent"
                 >
                   <span className="text-paragraph-bold">{game.title}</span>
                   {game.year && (
