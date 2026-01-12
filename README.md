@@ -1,6 +1,6 @@
 # Rule Finder
 
-AI-powered board game rules assistant. Get answers about game rules, see sources directly in the rulebook.
+AI-powered board game rules assistant. Get answers about game rules, see sources directly in the rulebook. This was good practice, and the idea is now abandoned – it would have been useful, but it would be a copyright violation to host these rule books (and actually showing the answers in the rulebook is a key feature).
 
 ## Prerequisites
 
