@@ -1,6 +1,6 @@
 # Rule Finder
 
-AI-powered board game rules assistant. Upload a rulebook PDF and get instant answers with page-level citations.
+AI-powered board game rules assistant. Get answers about game rules, see sources directly in the rulebook.
 
 ## Prerequisites
 
