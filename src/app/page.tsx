@@ -57,13 +57,7 @@ export default async function HomePage(): Promise<React.ReactElement> {
 
           {/* Game Grid */}
           {games.length > 0 ? (
-            <div
-              className="grid gap-6"
-              style={{
-                gridTemplateColumns: "repeat(auto-fit, minmax(140px, 170px))",
-                justifyContent: "start",
-              }}
-            >
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] justify-items-center gap-6">
               {games.map((game) => (
                 <GameTile
                   key={game.id}

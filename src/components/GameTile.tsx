@@ -13,7 +13,7 @@ export function GameTile({
   thumbnailUrl,
 }: GameTileProps): React.ReactElement {
   return (
-    <Link href={`/games/${slug}`} className="group block">
+    <Link href={`/games/${slug}`} className="group block w-full max-w-[162px]">
       {/* Square thumbnail */}
       <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-muted">
         {thumbnailUrl ? (
@@ -22,7 +22,7 @@ export function GameTile({
             alt={title}
             fill
             className="object-cover transition-transform group-hover:scale-[1.02]"
-            sizes="170px"
+            sizes="162px"
           />
         ) : (
           <div className="flex h-full items-center justify-center">
