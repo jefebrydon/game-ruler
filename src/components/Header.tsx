@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useSignUpModal } from "@/lib/signup-modal-context";
 
 type HeaderProps = {
   /** When true, header overlaps content (for homepage). When false, header is inline above content. */
@@ -8,6 +11,8 @@ type HeaderProps = {
 };
 
 export function Header({ floating = false }: HeaderProps): React.ReactElement {
+  const { open } = useSignUpModal();
+
   return (
     <header
       className={`${
@@ -32,7 +37,7 @@ export function Header({ floating = false }: HeaderProps): React.ReactElement {
       </Link>
 
       {/* Action */}
-      <Button variant="secondary">
+      <Button variant="secondary" onClick={open}>
         Sign Up
       </Button>
     </header>

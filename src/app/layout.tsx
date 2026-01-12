@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Fraunces, Nunito_Sans } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import { SignUpModalProvider } from "@/lib/signup-modal-context";
+import { SignUpModal } from "@/components/SignUpModal";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -31,8 +33,11 @@ export default function RootLayout({
       <body
         className={`${fraunces.variable} ${nunitoSans.variable} font-body antialiased`}
       >
-        {children}
-        <Toaster />
+        <SignUpModalProvider>
+          {children}
+          <SignUpModal />
+          <Toaster />
+        </SignUpModalProvider>
       </body>
     </html>
   );
