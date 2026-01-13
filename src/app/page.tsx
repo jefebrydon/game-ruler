@@ -11,7 +11,7 @@ export default async function HomePage(): Promise<React.ReactElement> {
     .from("rulebooks")
     .select("id, slug, title, thumbnail_url")
     .eq("status", "ready")
-    .order("created_at", { ascending: false })
+    .order("title", { ascending: true })
     .limit(20);
 
   const games = rulebooks ?? [];
@@ -21,18 +21,18 @@ export default async function HomePage(): Promise<React.ReactElement> {
       <Header floating />
       <main>
       {/* Hero Section */}
-      <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4">
+      <section className="relative isolate flex min-h-screen flex-col items-center justify-center overflow-hidden px-4">
         {/* Background Video */}
         <video
           autoPlay
           muted
           playsInline
-          className="absolute inset-0 h-full w-full object-cover -z-10"
+          className="absolute inset-0 z-0 h-full w-full object-cover"
         >
           <source src="/World_BG.mp4" type="video/mp4" />
         </video>
 
-        <div className="mx-auto w-full max-w-[344px] text-left">
+        <div className="relative z-10 mx-auto w-full max-w-[344px] text-left">
           <h1 className="text-h1 text-white text-shadow-dark">Find Rules Fast</h1>
           <p className="mt-4 text-subhead text-white text-shadow-dark">
             Clarify board game rules.
