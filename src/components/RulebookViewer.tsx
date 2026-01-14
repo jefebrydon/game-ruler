@@ -12,6 +12,9 @@ type RulebookViewerProps = {
   pageCount: number;
 };
 
+// Placeholder dimensions for canvases before rendering (prevents layout shift)
+type PageDimensions = { width: number; height: number };
+
 export function RulebookViewer({
   pdfUrl,
   pageCount,
@@ -20,13 +23,14 @@ export function RulebookViewer({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [highlightedPage, setHighlightedPage] = useState<number | null>(null);
+  const [pageDimensions, setPageDimensions] = useState<PageDimensions | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const pageRefs = useRef<Map<number, HTMLCanvasElement>>(new Map());
   const renderedPages = useRef<Set<number>>(new Set());
   const renderingPages = useRef<Set<number>>(new Set());
   const highlightTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Load PDF document
+  // Load PDF document and get page dimensions for stable layout
   useEffect(() => {
     let cancelled = false;
 
@@ -47,6 +51,13 @@ export function RulebookViewer({
         clearTimeout(timeoutId);
         
         if (!cancelled) {
+          // Get page 1 dimensions to set placeholder sizes for all pages
+          // This prevents layout shift when pages render lazily
+          const page1 = await loadedPdf.getPage(1);
+          const scale = 1.5;
+          const viewport = page1.getViewport({ scale });
+          setPageDimensions({ width: viewport.width, height: viewport.height });
+          
           setPdf(loadedPdf);
         }
       } catch (err) {
@@ -138,6 +149,20 @@ export function RulebookViewer({
 
     return () => observer.disconnect();
   }, [pdf, renderPage]);
+
+  // Set placeholder dimensions on all unrendered canvases for stable layout
+  // This ensures scroll calculations are correct before pages render
+  useEffect(() => {
+    if (!pageDimensions || !pdf) return;
+    
+    pageRefs.current.forEach((canvas, pageNum) => {
+      // Only set placeholder if not yet rendered (canvas default is 300x150)
+      if (!renderedPages.current.has(pageNum) && canvas.width !== pageDimensions.width) {
+        canvas.width = pageDimensions.width;
+        canvas.height = pageDimensions.height;
+      }
+    });
+  }, [pageDimensions, pdf]);
 
   // Scroll to a specific page
   const scrollToPage = useCallback((pageNum: number): void => {
